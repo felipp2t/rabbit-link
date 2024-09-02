@@ -3,6 +3,10 @@ export default {
   darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    fontFamily: {
+      sans: ["Montserrat", "sans-serif"],
+      title: ['Raleway', 'sans-serif']
+    },
     extend: {
       borderRadius: {
         lg: "var(--radius)",
