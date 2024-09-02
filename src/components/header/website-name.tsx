@@ -6,7 +6,7 @@ export function WebsiteName({ children, className }: HeaderGenericProps) {
   return (
     <h1
       className={cn(
-        "cursor-pointer text-xl font-semibold tracking-tight",
+        "font-title cursor-pointer text-2xl font-extrabold text-primary",
         className,
       )}
     >

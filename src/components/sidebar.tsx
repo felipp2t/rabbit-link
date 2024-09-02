@@ -6,7 +6,7 @@ export function Sidebar() {
     <Navigation.Root className="">
       <Navigation.Header>
         <Navigation.Logo>
-          <Rabbit className="size-6" />
+          <Rabbit className="size-8 text-muted" />
         </Navigation.Logo>
       </Navigation.Header>
       <Navigation.Main>
