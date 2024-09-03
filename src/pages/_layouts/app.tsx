@@ -1,7 +1,7 @@
 import { Header } from "@/components/header";
-import { BlockInTheSMScreen } from "@/components/screens/block-sm-screen";
-import { BlockInTheXLScreen } from "@/components/screens/block-xl-screen";
-import { HiddenInTheSMScreen } from "@/components/screens/hidden-sm-screen";
+import { BlockInTheSMScreen } from "@/components/hidden-and-block/block-sm-screen";
+import { BlockInTheXLScreen } from "@/components/hidden-and-block/block-xl-screen";
+import { HiddenInTheSMScreen } from "@/components/hidden-and-block/hidden-sm-screen";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Rabbit } from "lucide-react";
