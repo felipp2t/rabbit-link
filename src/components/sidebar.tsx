@@ -3,7 +3,7 @@ import { Navigation } from "./navigation";
 
 export function Sidebar() {
   return (
-    <Navigation.Root className="">
+    <Navigation.Root>
       <Navigation.Header>
         <Navigation.WebsiteName>Rabbit Link</Navigation.WebsiteName>
       </Navigation.Header>

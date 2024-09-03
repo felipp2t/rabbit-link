@@ -11,7 +11,7 @@ export function SidebarIcon() {
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="h-full w-3/5 bg-slate-100 p-0 xl:w-2/5"
+          className="h-full w-64 p-0 xl:w-2/5"
         >
           <Sidebar />
         </SheetContent>
