@@ -1,6 +1,6 @@
 import { Footer } from "./footer";
 import { Header } from "./header";
-import { Logo } from "./logo";
+import { WebsiteName } from "./website-name";
 import { Main } from "./main";
 import { Nav } from "./nav";
 import { NavHeader } from "./nav-header";
@@ -12,7 +12,7 @@ import { Root } from "./root";
 
 export const Navigation = {
   Root,
-  Logo,
+  WebsiteName,
   Header,
   Main,
   Nav,
