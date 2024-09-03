@@ -1,5 +1,7 @@
 import { Header } from "@/components/header";
-import { HiddenInTheXLScreen } from "@/components/screens/hidden-xl-screen";
+import { BlockInTheSMScreen } from "@/components/screens/block-sm-screen";
+import { BlockInTheXLScreen } from "@/components/screens/block-xl-screen";
+import { HiddenInTheSMScreen } from "@/components/screens/hidden-sm-screen";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Rabbit } from "lucide-react";
@@ -8,9 +10,9 @@ import { Outlet } from "react-router-dom";
 export function AppLayout() {
   return (
     <div className="flex min-h-screen flex-col antialiased">
-      <HiddenInTheXLScreen className="fixed left-0 top-0 h-full w-64">
+      <BlockInTheXLScreen className="fixed left-0 top-0 h-full w-64">
         <Sidebar />
-      </HiddenInTheXLScreen>
+      </BlockInTheXLScreen>
 
       <div className="xl:ml-64">
         <Header.Root className="flex items-center justify-between">
@@ -21,10 +23,16 @@ export function AppLayout() {
             </Header.Logo>
           </Header.Group>
 
-          <Header.SearchInput />
+          <BlockInTheSMScreen className="w-1/3">
+            <Header.SearchInput className="w-full" />
+          </BlockInTheSMScreen>
 
           <ThemeToggle />
         </Header.Root>
+
+        <HiddenInTheSMScreen>
+          <Header.SearchInput className="mx-auto my-4 w-96" />
+        </HiddenInTheSMScreen>
 
         <div className="flex flex-1 flex-col gap-4 p-8 pt-6">
           <Outlet />

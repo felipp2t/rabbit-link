@@ -1,14 +1,14 @@
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
-interface HiddenInTheXLScreenProps {
+interface BlockInTheXLScreenProps {
   children: ReactNode;
   className?: string;
 }
 
-export function HiddenInTheXLScreen({
+export function BlockInTheXLScreen({
   children,
   className,
-}: HiddenInTheXLScreenProps) {
+}: BlockInTheXLScreenProps) {
   return <div className={cn("hidden xl:block", className)}>{children}</div>;
 }

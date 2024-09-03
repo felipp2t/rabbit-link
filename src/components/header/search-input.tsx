@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Search } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
@@ -5,7 +6,11 @@ import { z } from "zod";
 import { Form, FormItem } from "../ui/form";
 import { Input } from "../ui/input";
 
-export function SearchInput() {
+export interface SearchInputProps {
+  className?: string;
+}
+
+export function SearchInput({ className }: SearchInputProps) {
   const valueValidation = z.object({
     value: z.string(),
   });
@@ -17,7 +22,7 @@ export function SearchInput() {
   });
 
   return (
-    <div className="w-1/3">
+    <div className={cn("w-1/3", className)}>
       <Form {...form}>
         <form>
           <Controller
