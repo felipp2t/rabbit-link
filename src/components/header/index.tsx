@@ -1,11 +1,13 @@
-import { Group } from "./group"
-import { Root } from "./root"
-import { SidebarIcon } from "./sidebar-icon"
-import { WebsiteName } from "./website-name"
+import { Group } from "./group";
+import { Logo } from "./logo";
+import { Root } from "./root";
+import { SearchInput } from "./search-input";
+import { SidebarIcon } from "./sidebar-icon";
 
 export const Header = {
   Root,
   Group,
   SidebarIcon,
-  WebsiteName,
-}
+  Logo,
+  SearchInput,
+};

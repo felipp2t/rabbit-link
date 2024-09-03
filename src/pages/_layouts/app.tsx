@@ -2,6 +2,7 @@ import { Header } from "@/components/header";
 import { HiddenInTheXLScreen } from "@/components/screens/hidden-xl-screen";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { Rabbit } from "lucide-react";
 import { Outlet } from "react-router-dom";
 
 export function AppLayout() {
@@ -15,8 +16,12 @@ export function AppLayout() {
         <Header.Root className="flex items-center justify-between">
           <Header.Group>
             <Header.SidebarIcon />
-            <Header.WebsiteName>Rabbit Link</Header.WebsiteName>
+            <Header.Logo>
+              <Rabbit className="size-8 text-muted" />
+            </Header.Logo>
           </Header.Group>
+
+          <Header.SearchInput />
 
           <ThemeToggle />
         </Header.Root>

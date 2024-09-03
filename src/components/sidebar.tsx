@@ -1,13 +1,11 @@
-import { CalendarPlus, Home, Layers, Rabbit, Search } from "lucide-react";
+import { CalendarPlus, Home, Layers, Search } from "lucide-react";
 import { Navigation } from "./navigation";
 
 export function Sidebar() {
   return (
     <Navigation.Root className="">
       <Navigation.Header>
-        <Navigation.Logo>
-          <Rabbit className="size-8 text-muted" />
-        </Navigation.Logo>
+        <Navigation.WebsiteName>Rabbit Link</Navigation.WebsiteName>
       </Navigation.Header>
       <Navigation.Main>
         <Navigation.Nav>
