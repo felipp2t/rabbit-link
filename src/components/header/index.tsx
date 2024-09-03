@@ -1,4 +1,5 @@
 import { Group } from "./group";
+import { SelectAddress } from "./location/select-address";
 import { Logo } from "./logo";
 import { Root } from "./root";
 import { SearchInput } from "./search-input";
@@ -9,5 +10,6 @@ export const Header = {
   Group,
   SidebarIcon,
   Logo,
+  SelectAddress,
   SearchInput,
 };

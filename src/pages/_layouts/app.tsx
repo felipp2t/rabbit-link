@@ -27,7 +27,10 @@ export function AppLayout() {
             <Header.SearchInput className="w-full" />
           </BlockInTheSMScreen>
 
-          <ThemeToggle />
+          <Header.Group className="md:gap-8">
+            <Header.SelectAddress />
+            <ThemeToggle />
+          </Header.Group>
         </Header.Root>
 
         <HiddenInTheSMScreen>
