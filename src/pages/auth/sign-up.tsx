@@ -65,9 +65,9 @@ export function SignUp() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Password</CardTitle>
+        <CardTitle>Cadastra-se</CardTitle>
         <CardDescription>
-          Change your password here. After saving, you'll be logged out.
+          Insira seus dados para criar uma conta e acessar nossos serviços.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">

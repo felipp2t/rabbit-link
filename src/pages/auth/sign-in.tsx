@@ -30,7 +30,7 @@ export function SignIn() {
     <Card>
       <CardHeader>
         <CardTitle className="text-2xl font-semibold tracking-tight">
-          Login
+          Faça Login
         </CardTitle>
         <CardDescription className="text-sm text-muted-foreground">
           Faça login para acessar sua conta e gerenciar seus serviços.
@@ -38,7 +38,7 @@ export function SignIn() {
       </CardHeader>
       <CardContent className="px-6">
         <Form {...form}>
-          <form className="space-y-4">
+          <form className="flex flex-col gap-4">
             <Controller
               control={form.control}
               name="email"
@@ -67,7 +67,11 @@ export function SignIn() {
               )}
             />
 
-            <Button className="mt-6 w-full py-6">Entrar</Button>
+            <Link to="/auth/esqueceu-senha" className="block text-end text-sm">
+              Esqueceu a senha?
+            </Link>
+
+            <Button className="w-full py-6">Entrar</Button>
           </form>
         </Form>
       </CardContent>

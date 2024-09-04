@@ -9,7 +9,7 @@ import { Outlet } from "react-router-dom";
 
 export function AppLayout() {
   return (
-    <div className="flex min-h-screen flex-col antialiased">
+    <div className="flex min-h-screen flex-col antialiased bg-background">
       <BlockInTheXLScreen className="fixed left-0 top-0 h-full w-64">
         <Sidebar />
       </BlockInTheXLScreen>
