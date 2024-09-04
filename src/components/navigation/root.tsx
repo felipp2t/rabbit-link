@@ -5,7 +5,7 @@ export const Root = ({ children, className }: SidebarGenericProps) => {
   return (
     <aside
       className={cn(
-        "flex h-full w-64  flex-col space-y-6 bg-background border-r",
+        "flex h-full w-64 flex-col space-y-6 border-r bg-background",
         className,
       )}
     >
