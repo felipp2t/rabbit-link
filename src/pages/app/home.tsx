@@ -2,10 +2,10 @@ import { SectionCard } from "@/components/section-card";
 
 export function Home() {
   return (
-    <div className="mt-16">
+    <main>
       <SectionCard title="Serviços da sua região" />
       <SectionCard title="Pessoas recomendadas da sua região - presencial" />
       <SectionCard title="Serviços da sua região" />
-    </div>
+    </main>
   );
 }

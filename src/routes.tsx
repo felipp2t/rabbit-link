@@ -7,13 +7,17 @@ import { AuthPage } from "./pages/auth/auth-page";
 import { SendEmail } from "./pages/auth/reset-passsword/send-email";
 import { ConfirmOTP } from "./pages/auth/reset-passsword/confirm-otp";
 import { ResetPassword } from "./pages/auth/reset-passsword/reset-password";
+import { Service } from "./pages/app/service";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
     errorElement: <NotFound />,
-    children: [{ path: "/", element: <Home /> }],
+    children: [
+      { path: "/", element: <Home /> },
+      { path: "/servico/:id", element: <Service /> },
+    ],
   },
   {
     path: "/",
