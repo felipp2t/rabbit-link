@@ -1,3 +1,11 @@
+import { SectionCard } from "@/components/section-card";
+
 export function Home() {
-  return <h1>Hello World</h1>;
+  return (
+    <>
+      <SectionCard title="Serviços da sua região" />
+      <SectionCard title="Pessoas recomendadas da sua região - presencial" />
+      <SectionCard title="Serviços da sua região" />
+    </>
+  );
 }

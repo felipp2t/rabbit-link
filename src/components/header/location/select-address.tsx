@@ -86,8 +86,8 @@ export function SelectAddress() {
                         R. Argemiro Frutuoso, 385 Apartamento
                       </p>
                     </div>
-                    <Button className="group grid size-8 place-content-center self-start bg-transparent p-0 hover:bg-transparent">
-                      <EllipsisVertical className="size-6 self-start group-hover:text-muted-foreground" />
+                    <Button className="group grid size-8 place-content-center self-start bg-transparent p-0 text-muted-foreground hover:bg-transparent">
+                      <EllipsisVertical className="size-6 self-start group-hover:text-muted" />
                     </Button>
                   </div>
                 </form>
@@ -103,18 +103,20 @@ export function SelectAddress() {
                         R. Argemiro Frutuoso, 385 Apartamento
                       </p>
                     </div>
-                    <Button className="group grid size-8 place-content-center self-start bg-transparent p-0 hover:bg-transparent">
-                      <EllipsisVertical className="size-6 self-start group-hover:text-muted-foreground" />
+                    <Button className="group grid size-8 place-content-center self-start bg-transparent p-0 text-muted-foreground hover:bg-transparent">
+                      <EllipsisVertical className="size-6 self-start group-hover:text-muted" />
                     </Button>
                   </div>
                 </form>
               </Card>
 
               <DialogFooter>
-                <Button onClick={() => {
-                    setIsSelectAddress(false)
-                    setIsSearchAddressModal(true)}
-                }>
+                <Button
+                  onClick={() => {
+                    setIsSelectAddress(false);
+                    setIsSearchAddressModal(true);
+                  }}
+                >
                   Adicionar endereço
                 </Button>
               </DialogFooter>
