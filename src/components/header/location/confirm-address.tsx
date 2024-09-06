@@ -86,7 +86,7 @@ export function ConfirmAddress({ location }: ConfirmAddressProps) {
           render={({ field }) => (
             <FormItem className="col-span-4 col-start-1">
               <div className="flex items-center gap-2">
-                <Label htmlFor="neighborhood" className="">
+                <Label htmlFor="neighborhood">
                   Bairro
                 </Label>
                 <Input {...field} id="neighborhood" />

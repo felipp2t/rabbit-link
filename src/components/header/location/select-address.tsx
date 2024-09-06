@@ -1,6 +1,7 @@
+import { AddZipCodeDialog } from "@/components/add-zip-code-dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import cep from "cep-promise";
+import { searchLocationByCEP } from "@/utils/serch-location-by-cep";
 import {
   ChevronDown,
   ChevronLeft,
@@ -18,8 +19,7 @@ import {
   DialogTrigger,
 } from "../../ui/dialog";
 import { ConfirmAddress } from "./confirm-address";
-import { SearchAddress } from "./search-address";
-import { CepSchema } from "./types/cep";
+import { CepSchema } from "@/types/cep";
 
 export function SelectAddress() {
   const [isSelectAddress, setIsSelectAddress] = useState(true);
@@ -35,11 +35,10 @@ export function SelectAddress() {
   });
 
   async function handleSearchCep(data: CepSchema) {
-    const location = await cep(data.cep);
+    const location = await searchLocationByCEP(data.cep);
     setIsSearchAddressModal(false);
     setIsConfirmAddress(true);
 
-    console.log(location);
     setAddress({ ...location, street: location.street.replace("Rua", "") });
   }
 
@@ -124,7 +123,7 @@ export function SelectAddress() {
           )}
 
           {isSearchAddressModal && (
-            <SearchAddress handleSearchCep={handleSearchCep} />
+            <AddZipCodeDialog handleSearchCep={handleSearchCep} />
           )}
 
           {isConfirmAddress && <ConfirmAddress location={address} />}
