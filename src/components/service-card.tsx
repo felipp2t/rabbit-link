@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Separator } from "./ui/separator";
 
-export function Service() {
+export function ServiceCard() {
   return (
     <Card className="flex h-96 w-64 flex-shrink-0 select-none flex-col md:h-[410px] md:w-72">
       <CardHeader className="p-0">
