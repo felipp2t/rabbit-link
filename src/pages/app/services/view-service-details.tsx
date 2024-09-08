@@ -7,7 +7,7 @@ import {
   MessageCircleIcon,
   StarIcon,
 } from "lucide-react";
-import ImagemPerfil from "../../../public/imagem-perfil.jpg";
+import ImagemPerfil from "/imagem-perfil.jpg";
 
 export function Service() {
   const servico = {

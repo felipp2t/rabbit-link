@@ -1,13 +1,14 @@
 export type Availability = {
-  [key: string]: { start: string; end: string } | null;
+  [key: string]: { start: string; end: string } | null
 };
 
-export interface FormDataProps {
+export interface Service {
+  id: string;
   categories: string[];
   title: string;
   description: string;
   price: string;
   location: string;
-  workType: "remoto" | "presencial" | "ambos";
+  workType: "remoto" | "presencial" | "híbrido";
   availability: Availability;
 }

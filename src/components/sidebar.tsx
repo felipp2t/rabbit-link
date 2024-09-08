@@ -23,7 +23,7 @@ export function Sidebar() {
               <Navigation.NavLinkTitle>Procurar</Navigation.NavLinkTitle>
             </Navigation.NavLink>
 
-            <Navigation.NavLink to="/servicos">
+            <Navigation.NavLink to="/meus-servicos">
               <Layers className="size-4" />
               <Navigation.NavLinkTitle>Serviços</Navigation.NavLinkTitle>
             </Navigation.NavLink>

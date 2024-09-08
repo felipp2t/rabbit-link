@@ -1,17 +1,12 @@
 import { Badge } from "@/components/ui/badge";
-import { useCreateService } from "@/context/use-create-service";
+import { useServiceStore } from "@/context/use-service-store";
 import { Briefcase, Clock, MapPin } from "lucide-react";
 
 export function ConfirmDetails() {
   const {
     categoriesSelected,
-    title,
-    price,
-    description,
-    location,
-    workType,
-    availability,
-  } = useCreateService();
+    service: { title, price, description, location, workType, availability },
+  } = useServiceStore();
 
   return (
     <div className="space-y-5">

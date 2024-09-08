@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useCreateService } from "@/context/use-create-service";
+import { useServiceStore } from "@/context/use-service-store";
 import { cn } from "@/lib/utils";
 import { ConfirmDetails } from "./confirm-details";
 import { FillInServiceDetails } from "./fill-in-service-details";
@@ -16,7 +16,7 @@ async function handleSubmit() {}
 
 export function FormWizard() {
   const { step, handleNext, handlePrevious, handleValidationToNextStep } =
-    useCreateService();
+    useServiceStore();
 
   return (
     <div className="container mx-auto py-8">

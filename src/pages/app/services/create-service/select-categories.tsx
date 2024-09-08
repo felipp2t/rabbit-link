@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { categories } from "@/constants/categories";
-import { useCreateService } from "@/context/use-create-service";
+import { useServiceStore } from "@/context/use-service-store";
 import { cn } from "@/lib/utils";
 import { CheckIcon } from "lucide-react";
 
 export function SelectCategories() {
-  const { addCategory, categoriesSelected } = useCreateService();
+  const { addCategory, categoriesSelected } = useServiceStore();
 
   return (
     <main className="space-y-4">
