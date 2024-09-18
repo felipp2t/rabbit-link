@@ -1,43 +1,47 @@
 import { ChevronRight, Star } from "lucide-react";
 import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader } from "./ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Separator } from "./ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Link } from "react-router-dom";
 
 export function ServiceCard() {
   return (
-    <Card className="flex h-96 w-64 flex-shrink-0 select-none flex-col md:h-[410px] md:w-72">
-      <CardHeader className="p-0">
-        <img
-          className="rounded-t-lg"
-          src="https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
-          alt="imagem_header"
-        />
+    <Card className="mx-auto flex h-80 w-72 md:w-80 xl:w-full max-w-md shrink-0 flex-col">
+      <CardHeader className="flex flex-row items-center gap-4">
+        <Avatar className="size-12 md:size-14 xl:size-16">
+          <AvatarImage
+            alt="User profile"
+            src="/placeholder.svg?height=64&width=64"
+          />
+          <AvatarFallback>UN</AvatarFallback>
+        </Avatar>
+
+        <div className="flex flex-col">
+          <h2 className="text-base md:text-lg xl:text-xl font-bold">User Name</h2>
+          <p className="text-sm text-muted-foreground">Professional Title</p>
+        </div>
       </CardHeader>
-      <CardContent className="flex h-full flex-grow flex-col justify-between rounded-b-lg pb-4 pt-2">
-        <h4 className="py-2 text-muted-foreground">Felipe Rossetto</h4>
-
-        <Separator />
-
-        <p className="my-2 line-clamp-4 text-sm md:line-clamp-5">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil
-          distinctio sint enim doloribus animi iure qui nisi necessitatibus
-          quisquam ex? af dsf sd fsd f ds fds sdfa
+      <CardContent>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+          quia dolores explicabo omnis sint facere laboriosam facilis hic eum
+          minus?
         </p>
-
-        <div className="flex justify-between">
-          <div className="flex items-center gap-2 py-2">
-            <Star className="size-6 text-primary" />
-            <span className="text-muted-foreground">5.0</span>
-          </div>
-          <Button
-            variant="ghost"
-            className="flex w-36 gap-2 font-semibold transition-all duration-200 ease-out hover:translate-x-2 md:w-40"
-          >
-            Ver mais
-            <ChevronRight />
-          </Button>
+        <div className="flex items-center gap-0.5">
+          <Star className="size-4 xl:size-5 fill-yellow-400 text-yellow-400" />
+          <Star className="size-4 xl:size-5 fill-yellow-400 text-yellow-400" />
+          <Star className="size-4 xl:size-5 fill-yellow-400 text-yellow-400" />
+          <Star className="size-4 xl:size-5 fill-yellow-400 text-yellow-400" />
+          <Star className="size-4 xl:size-5  text-yellow-400" />
+          <span className="ml-2 text-sm font-medium">4.0</span>
         </div>
       </CardContent>
+      <CardFooter className="mt-auto">
+        <Button className="w-full" asChild>
+          <Link to="/servico/123">Ver mais</Link>
+        </Button>
+      </CardFooter>
     </Card>
   );
 }
