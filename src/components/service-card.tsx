@@ -1,13 +1,12 @@
-import { ChevronRight, Star } from "lucide-react";
+import { Star } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
-import { Separator } from "./ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Link } from "react-router-dom";
 
 export function ServiceCard() {
   return (
-    <Card className="mx-auto flex h-80 w-72 md:w-80 xl:w-full max-w-md shrink-0 flex-col">
+    <Card className="mx-auto flex h-80 w-72 max-w-md shrink-0 flex-col md:w-80 xl:w-full">
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar className="size-12 md:size-14 xl:size-16">
           <AvatarImage
@@ -18,7 +17,9 @@ export function ServiceCard() {
         </Avatar>
 
         <div className="flex flex-col">
-          <h2 className="text-base md:text-lg xl:text-xl font-bold">User Name</h2>
+          <h2 className="text-base font-bold md:text-lg xl:text-xl">
+            User Name
+          </h2>
           <p className="text-sm text-muted-foreground">Professional Title</p>
         </div>
       </CardHeader>
@@ -29,11 +30,11 @@ export function ServiceCard() {
           minus?
         </p>
         <div className="flex items-center gap-0.5">
-          <Star className="size-4 xl:size-5 fill-yellow-400 text-yellow-400" />
-          <Star className="size-4 xl:size-5 fill-yellow-400 text-yellow-400" />
-          <Star className="size-4 xl:size-5 fill-yellow-400 text-yellow-400" />
-          <Star className="size-4 xl:size-5 fill-yellow-400 text-yellow-400" />
-          <Star className="size-4 xl:size-5  text-yellow-400" />
+          <Star className="size-4 fill-yellow-400 text-yellow-400 xl:size-5" />
+          <Star className="size-4 fill-yellow-400 text-yellow-400 xl:size-5" />
+          <Star className="size-4 fill-yellow-400 text-yellow-400 xl:size-5" />
+          <Star className="size-4 fill-yellow-400 text-yellow-400 xl:size-5" />
+          <Star className="size-4 text-yellow-400 xl:size-5" />
           <span className="ml-2 text-sm font-medium">4.0</span>
         </div>
       </CardContent>

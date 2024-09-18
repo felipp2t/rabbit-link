@@ -40,7 +40,7 @@ export function ConfirmDetails() {
         <h3 className="text-lg font-semibold">Localização</h3>
         <p className="flex items-center">
           <MapPin className="mr-2 h-4 w-4" />
-          {location}
+          {location.city}, {location.state}
         </p>
       </div>
 
