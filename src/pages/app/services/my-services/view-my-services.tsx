@@ -117,10 +117,12 @@ export function ViewMyServices() {
 
   return (
     <div className="container mx-auto p-4">
-      <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Meus Serviços Cadastrados</h1>
+      <header className="mb-6 flex flex-col items-center justify-between gap-5 md:flex-row">
+        <h1 className="text-center text-2xl font-bold">
+          Meus Serviços Cadastrados
+        </h1>
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Novo Serviço
+          <PlusCircle className="mr-2 size-4" /> Adicionar Novo Serviço
         </Button>
       </header>
 
@@ -141,17 +143,17 @@ export function ViewMyServices() {
                   </Badge>
                 ))}
               </div>
-              <p className="text-2xl font-bold">
+              <p className="text-xl font-bold xl:text-2xl">
                 R$ {Number(service.price).toFixed(2)}
               </p>
 
-              <p className="flex items-center">
-                <MapPin className="mr-2 h-4 w-4" />
+              <p className="flex items-center text-sm xl:text-base">
+                <MapPin className="mr-2 size-4" />
                 {service.location.city}, {service.location.state}
               </p>
 
-              <p className="flex items-center">
-                <Briefcase className="mr-2 h-4 w-4" />
+              <p className="flex items-center text-sm xl:text-base">
+                <Briefcase className="mr-2 size-4" />
                 {service.workType!.toUpperCase()}
               </p>
 
