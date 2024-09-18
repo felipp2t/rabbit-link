@@ -7,6 +7,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { handleSendEmail } from "@/http/auth/send-email";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { SendEmailSchema, sendEmailValidator } from "./types/send-email";
@@ -17,26 +18,10 @@ export function SendEmail() {
     resolver: zodResolver(sendEmailValidator),
   });
 
-  async function handleSendEmail({ email }: SendEmailSchema) {
-    const BASIC_API_URL = import.meta.env.VITE_BACKEND_API_URL;
-
-    try {
-      await fetch(BASIC_API_URL + "/api/forgot-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true",
-        },
-        body: JSON.stringify({
-          email,
-        }),
-      });
-
-      const emailEncode = encodeURIComponent(email);
-      location.href = `/auth/confirm-otp?email=${emailEncode}`;
-    } catch (error) {
-      console.error(error);
-    }
+  async function onSubmit(data: SendEmailSchema) {
+    handleSendEmail({
+      email: data.email,
+    });
   }
 
   return (
@@ -55,7 +40,7 @@ export function SendEmail() {
       <Form {...form}>
         <form
           className="flex flex-col items-center gap-4"
-          onSubmit={form.handleSubmit(handleSendEmail)}
+          onSubmit={form.handleSubmit(onSubmit)}
         >
           <Controller
             control={form.control}

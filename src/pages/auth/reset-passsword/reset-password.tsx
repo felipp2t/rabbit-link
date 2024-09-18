@@ -1,25 +1,25 @@
 import { Button } from "@/components/ui/button";
 import {
-  Form,
   FormControl,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { handleResetPassword } from "@/http/auth/reset-password";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
 import {
   ResetPasswordSchema,
   resetPasswordValidation,
 } from "./types/reset-password";
-import { useSearchParams } from "react-router-dom";
 
 export function ResetPassword() {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
 
-  const form = useForm<ResetPasswordSchema>({
+  const { control, handleSubmit, formState } = useForm<ResetPasswordSchema>({
     defaultValues: {
       password: "",
       confirmPassword: "",
@@ -27,31 +27,14 @@ export function ResetPassword() {
     resolver: zodResolver(resetPasswordValidation),
   });
 
-  async function handleResetPassword({
-    password,
-    confirmPassword,
-  }: ResetPasswordSchema) {
-    const BASIC_API_URL = import.meta.env.VITE_BACKEND_API_URL;
+  async function onSubmit(data: ResetPasswordSchema) {
+    if (!email) return;
 
-    try {
-      await fetch(
-        BASIC_API_URL + `/api/forgot-password/reset-password?email=${email}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            password,
-            confirmPassword,
-          }),
-        },
-      );
-
-      location.href = "/auth";
-    } catch (error) {
-      console.error(error);
-    }
+    handleResetPassword({
+      email,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+    });
   }
 
   return (
@@ -67,46 +50,44 @@ export function ResetPassword() {
         </p>
       </div>
 
-      <Form {...form}>
-        <form
-          className="flex flex-col items-center gap-4"
-          onSubmit={form.handleSubmit(handleResetPassword)}
-        >
-          <Controller
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel htmlFor="password">Senha</FormLabel>
-                <FormControl>
-                  <Input {...field} id="password" className="w-72" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <form
+        className="flex flex-col items-center gap-4"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <Controller
+          control={control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel htmlFor="password">Senha</FormLabel>
+              <FormControl>
+                <Input {...field} id="password" className="w-72" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <Controller
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel htmlFor="confirmPassword">
-                  Confirme sua senha
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} id="confirmPassword" className="w-72" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Controller
+          control={control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel htmlFor="confirmPassword">
+                Confirme sua senha
+              </FormLabel>
+              <FormControl>
+                <Input {...field} id="confirmPassword" className="w-72" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <Button disabled={form.formState.isSubmitting} className="w-full">
-            {form.formState.isSubmitting ? "Confirmando..." : "Confirmar"}
-          </Button>
-        </form>
-      </Form>
+        <Button disabled={formState.isSubmitting} className="w-full">
+          {formState.isSubmitting ? "Confirmando..." : "Confirmar"}
+        </Button>
+      </form>
     </div>
   );
 }
