@@ -7,16 +7,66 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useServiceStore } from "@/context/use-service-store";
+import { useUserStore } from "@/context/use-user-store";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 import { ConfirmDetails } from "./confirm-details";
 import { FillInServiceDetails } from "./fill-in-service-details";
 import { SelectCategories } from "./select-categories";
 
-async function handleSubmit() {}
-
 export function FormWizard() {
-  const { step, handleNext, handlePrevious, handleValidationToNextStep } =
-    useServiceStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    service: { title, description, location, price, categories },
+    step,
+    handleNext,
+    handlePrevious,
+    handleValidationToNextStep,
+    setLocation,
+  } = useServiceStore();
+
+  const { user } = useUserStore();
+
+  const locationSelected = user.addresses?.find((address) => address.selected);
+
+  useEffect(() => {
+    if (locationSelected) {
+      setLocation({
+        id: locationSelected.id,
+        city: locationSelected.address.city,
+        state: locationSelected.address.state,
+      });
+    }
+  }, [locationSelected, setLocation]);
+
+  const token = localStorage.getItem("token");
+
+  async function handleSubmit() {
+    try {
+      setIsSubmitting(true);
+
+      await fetch("https://a34e-201-76-2-12.ngrok-free.app/api/services", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          location,
+          price: Number(price),
+          categories,
+        }),
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <div className="container mx-auto py-8">
@@ -41,7 +91,7 @@ export function FormWizard() {
           <form onSubmit={handleSubmit}>
             {step === 1 && <SelectCategories />}
 
-            {step === 2 && <FillInServiceDetails />}
+            {step === 2 && <FillInServiceDetails onlySearch />}
 
             {step === 3 && <ConfirmDetails />}
           </form>
@@ -61,7 +111,9 @@ export function FormWizard() {
                 Próximo
               </Button>
             ) : (
-              <Button onClick={handleSubmit}>Publicar Serviço</Button>
+              <Button onClick={handleSubmit} disabled={isSubmitting}>
+                Publicar Serviço
+              </Button>
             )}
           </div>
         </CardFooter>

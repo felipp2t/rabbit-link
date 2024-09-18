@@ -7,7 +7,13 @@ import {
   ServiceDetailsValidation,
 } from "../_types/fill-in-service-details";
 
-export function FillInServiceDetails() {
+interface FillInServiceDetailsProps {
+  onlySearch?: boolean;
+}
+
+export function FillInServiceDetails({
+  onlySearch = false,
+}: FillInServiceDetailsProps) {
   const { service } = useServiceStore();
 
   const form = useForm<ServiceDetailsSchema>({
@@ -22,7 +28,7 @@ export function FillInServiceDetails() {
       </p>
 
       <div>
-        <ServiceForm form={form} service={service} />
+        <ServiceForm form={form} service={service} onlySearch={onlySearch} />
       </div>
     </main>
   );

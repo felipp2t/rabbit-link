@@ -1,3 +1,4 @@
+import { ServiceForm } from "@/components/service-form";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,25 +36,25 @@ import {
   ServiceDetailsSchema,
   ServiceDetailsValidation,
 } from "../_types/fill-in-service-details";
-import { ServiceForm } from "@/components/service-form";
 
 export function ViewMyServices() {
-  const {
-    selectServiceById,
-  } = useServiceStore();
+  const { selectServiceById } = useServiceStore();
 
   const form = useForm<ServiceDetailsSchema>({
     resolver: zodResolver(ServiceDetailsValidation),
   });
 
-   function handleSearchService(id: string) {
+  function handleSearchService(id: string) {
     const serviceFound: Service | null = selectServiceById(id);
-
-    console.log(serviceFound);
 
     if (serviceFound) {
       form.reset({
-        ...serviceFound,
+        title: serviceFound.title,
+        location: `${serviceFound.location.city}, ${serviceFound.location.state}`,
+        availability: serviceFound.availability,
+        description: serviceFound.description,
+        price: serviceFound.price,
+        workType: serviceFound.workType,
       });
     }
   }
@@ -68,11 +69,15 @@ export function ViewMyServices() {
       title: "Limpeza",
       description: "Serviço de limpeza de casa",
       price: "100",
-      location: "São Paulo, SP",
+      location: {
+        id: "52822843-b273-50b1-868f-17e476df0800",
+        city: "São Paulo",
+        state: "SP",
+      },
       availability: {
         segunda: { start: "09:00", end: "17:00" },
       },
-      workType: "remoto",
+      workType: "REMOTO",
       categories: ["limpeza", "Doméstico"],
     },
     {
@@ -80,11 +85,15 @@ export function ViewMyServices() {
       title: "Limpeza",
       description: "Serviço de limpeza de casa",
       price: "100",
-      location: "São Paulo, SP",
+      location: {
+        id: "52822843-b273-50b1-868f-17e476df0800",
+        city: "Rio de Janeiro",
+        state: "RJ",
+      },
       availability: {
         segunda: { start: "09:00", end: "17:00" },
       },
-      workType: "remoto",
+      workType: "HÍBRIDO",
       categories: ["limpeza", "Doméstico"],
     },
 
@@ -93,11 +102,15 @@ export function ViewMyServices() {
       title: "Limpeza",
       description: "Serviço de limpeza de casa",
       price: "100",
-      location: "São Paulo, SP",
+      location: {
+        id: "52822843-b273-50b1-868f-17e476df0800",
+        city: "Minas Gerais",
+        state: "MG",
+      },
       availability: {
         segunda: { start: "09:00", end: "17:00" },
       },
-      workType: "remoto",
+      workType: "PRESENCIAL",
       categories: ["limpeza", "Doméstico"],
     },
   ];
@@ -134,7 +147,7 @@ export function ViewMyServices() {
 
               <p className="flex items-center">
                 <MapPin className="mr-2 h-4 w-4" />
-                {service.location}
+                {service.location.city}, {service.location.state}
               </p>
 
               <p className="flex items-center">
@@ -175,6 +188,7 @@ export function ViewMyServices() {
                   <ServiceForm service={service} form={form} />
                 </DialogContent>
               </Dialog>
+
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive">Excluir</Button>

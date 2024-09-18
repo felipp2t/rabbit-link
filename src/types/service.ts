@@ -1,6 +1,12 @@
-export type Availability = {
-  [key: string]: { start: string; end: string } | null
-};
+export interface Availability {
+  [key: string]: { start: string; end: string } | null;
+}
+
+export interface Location {
+  id: string;
+  city: string;
+  state: string;
+}
 
 export interface Service {
   id: string;
@@ -8,7 +14,7 @@ export interface Service {
   title: string;
   description: string;
   price: string;
-  location: string;
-  workType: "remoto" | "presencial" | "híbrido";
+  location: Location;
+  workType: "REMOTO" | "PRESENCIAL" | "HÍBRIDO";
   availability: Availability;
 }

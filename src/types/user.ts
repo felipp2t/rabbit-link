@@ -1,3 +1,5 @@
+import { Address } from "./address";
+
 export interface User {
   profilePicture: string | null;
   name: string;
@@ -8,6 +10,7 @@ export interface User {
   phone: string;
   profession: string | null;
   description: string | null;
+  addresses: Address[];
   birthDate: string;
   role: string;
 }

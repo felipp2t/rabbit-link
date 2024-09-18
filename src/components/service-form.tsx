@@ -1,11 +1,13 @@
+import { LocationManagerModal } from "@/components/location-manager-modal";
 import { daysOfWeek } from "@/constants/days-of-weeks";
 import { useServiceStore } from "@/context/use-service-store";
-import { CepSchema } from "@/types/cep";
-import { Availability, Service } from "@/types/service";
-import { searchLocationByCEP } from "@/utils/serch-location-by-cep";
-import { ArrowRightLeft } from "lucide-react";
+import { useUserStore } from "@/context/use-user-store";
+import { cn } from "@/lib/utils";
+import { Availability, Location, Service } from "@/types/service";
+import { ArrowRightLeft, EllipsisVertical, House } from "lucide-react";
+import { useState } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
-import { AddZipCodeDialog } from "./add-zip-code-dialog";
+import { LocationPanel } from "./location-manager";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
 import {
@@ -31,6 +33,7 @@ import {
 import { Textarea } from "./ui/textarea";
 
 interface ServiceFormProps {
+  onlySearch?: boolean;
   service: Service;
   form: UseFormReturn<
     {
@@ -38,7 +41,7 @@ interface ServiceFormProps {
       description: string;
       price: string;
       location: string;
-      workType: "remoto" | "presencial" | "híbrido";
+      workType: "REMOTO" | "PRESENCIAL" | "HÍBRIDO";
       availability: Availability;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,19 +52,43 @@ interface ServiceFormProps {
 
 export function ServiceForm({ service, form }: ServiceFormProps) {
   const {
+    service: { location },
+  } = useServiceStore();
+  const { user } = useUserStore();
+
+  const locationDefault = user.addresses.find(({ selected }) => selected);
+  const locationDefaultFormatted = {
+    id: locationDefault?.id ?? "",
+    city: locationDefault?.address.city ?? "",
+    state: locationDefault?.address.state ?? "",
+  };
+
+  const [locationValue, setLocationValue] = useState<Location>(
+    location || locationDefaultFormatted,
+  );
+
+  const {
     setTitle,
     setPrice,
     setDescription,
-    setLocation,
     setWorkType,
+    setLocation,
     handleDayToggle,
     handleTimeChange,
   } = useServiceStore();
 
-  async function handleSearchCep(data: CepSchema) {
-    const { state, city } = await searchLocationByCEP(data.cep);
+  function handleSelectAddressToService(addressId: string) {
+    const addressFound = user.addresses.find(({ id }) => id === addressId);
+    if (addressFound) {
+      const addressSeleted: Location = {
+        id: addressFound.id,
+        city: addressFound.address.city,
+        state: addressFound.address.state,
+      };
 
-    setLocation(`${city}, ${state}`);
+      setLocationValue(addressSeleted);
+      setLocation(addressSeleted);
+    }
   }
 
   return (
@@ -140,38 +167,73 @@ export function ServiceForm({ service, form }: ServiceFormProps) {
           name="location"
           render={() => (
             <FormItem className="col-span-2">
-              <FormLabel htmlFor="location">Localização</FormLabel>
+              <FormLabel htmlFor="location">
+                {service.location.city.length > 0 ? (
+                  <span>Localização</span>
+                ) : (
+                  <span>Você ainda não possui uma localização.</span>
+                )}
+              </FormLabel>
               <FormControl>
-                <Dialog>
-                  {service.location.length > 0 ? (
+                <LocationPanel.Root>
+                  {service.location.city.length > 0 ? (
                     <div className="flex items-center gap-2">
-                      <Input value={service.location} />
-                      <DialogTrigger asChild>
+                      <Input
+                        value={`${locationValue.city}, ${location.state}`}
+                      />
+                      <LocationPanel.Trigger>
                         <Button className="size-9 px-2">
                           <ArrowRightLeft className="size-6" />
                         </Button>
-                      </DialogTrigger>
+                      </LocationPanel.Trigger>
+                      <LocationPanel.Content>
+                        <LocationPanel.Header>
+                          <LocationPanel.TitleSelectAddress show>
+                            Selecione um endereço
+                          </LocationPanel.TitleSelectAddress>
+                        </LocationPanel.Header>
+                        {user.addresses?.map((address) => (
+                          <LocationPanel.AddressCard
+                            key={address.id}
+                            className={cn(
+                              "",
+                              address.id === locationValue.id &&
+                                "ring-2 ring-primary",
+                            )}
+                            onClick={() =>
+                              handleSelectAddressToService(address.id)
+                            }
+                          >
+                            <House className="size-6" />
+                            <LocationPanel.CardContent>
+                              <LocationPanel.CardType>
+                                {address.type}
+                              </LocationPanel.CardType>
+                              <LocationPanel.CardStreetNumber>
+                                <span>
+                                  {address.address.street},{" "}
+                                  {address.address.state}
+                                </span>
+                              </LocationPanel.CardStreetNumber>
+                            </LocationPanel.CardContent>
+                            <Button className="group grid size-8 place-content-center self-start bg-transparent p-0 text-muted-foreground hover:bg-transparent">
+                              <EllipsisVertical className="size-6 self-start group-hover:text-muted" />
+                            </Button>
+                          </LocationPanel.AddressCard>
+                        ))}
+                      </LocationPanel.Content>
                     </div>
                   ) : (
-                    <DialogTrigger className="block w-full" asChild>
-                      <Button className="w-full border bg-background text-foreground hover:bg-secondary">
-                        Selecionar Localização
-                      </Button>
-                    </DialogTrigger>
+                    <>
+                      <LocationPanel.Trigger>
+                        <Button className="w-full border bg-background text-foreground hover:bg-secondary">
+                          Selecionar Localização
+                        </Button>
+                      </LocationPanel.Trigger>
+                      <LocationManagerModal />
+                    </>
                   )}
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>
-                        Adicione a localizão do serviço.
-                      </DialogTitle>
-                    </DialogHeader>
-
-                    <AddZipCodeDialog
-                      handleSearchCep={handleSearchCep}
-                      isClose
-                    />
-                  </DialogContent>
-                </Dialog>
+                </LocationPanel.Root>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -188,7 +250,7 @@ export function ServiceForm({ service, form }: ServiceFormProps) {
                 <Select
                   {...field}
                   onValueChange={(value) => {
-                    setWorkType(value as "presencial" | "remoto" | "híbrido");
+                    setWorkType(value as "PRESENCIAL" | "REMOTO" | "HÍBRIDO");
                   }}
                 >
                   <SelectTrigger>
@@ -196,9 +258,9 @@ export function ServiceForm({ service, form }: ServiceFormProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="remoto">Remoto</SelectItem>
-                      <SelectItem value="presencial">Presencial</SelectItem>
-                      <SelectItem value="híbrido">Híbrido</SelectItem>
+                      <SelectItem value="REMOTO">Remoto</SelectItem>
+                      <SelectItem value="PRESENCIAL">Presencial</SelectItem>
+                      <SelectItem value="HÍBRIDO">Híbrido</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>

@@ -20,7 +20,7 @@ export function SelectCategories() {
                 key={category.name}
                 className={cn(
                   "cursor-pointer transition-all",
-                  categoriesSelected.includes(category.name)
+                  categoriesSelected.includes(category.id)
                     ? "border-primary shadow-md"
                     : "hover:border-gray-300",
                 )}

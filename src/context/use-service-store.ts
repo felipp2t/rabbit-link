@@ -1,11 +1,10 @@
-import { Service } from "@/types/service";
+import { Service, Location } from "@/types/service";
 import { create } from "zustand";
 
 interface ServiceState {
   service: Service;
-
   categoriesSelected: string[];
-  addCategory: (category: string) => void;
+  addCategory: (categoryId: string) => void;
 
   step: number;
 
@@ -23,22 +22,29 @@ interface ServiceState {
   setTitle: (title: string) => void;
   setPrice: (price: string) => void;
   setDescription: (description: string) => void;
-  setLocation: (location: string) => void;
-  setWorkType: (workType: "remoto" | "presencial" | "híbrido") => void;
+  setLocation: (location: Location) => void;
+  setWorkType: (workType: "REMOTO" | "PRESENCIAL" | "HÍBRIDO") => void;
 
   handleValidationToNextStep: () => boolean;
+
+  error: string | null;
 }
 
 export const useServiceStore = create<ServiceState>()((set, get) => ({
   step: 1,
+  error: null,
 
   service: {
     id: "",
     title: "",
     description: "",
     price: "",
-    location: "",
-    workType: "remoto",
+    location: {
+      id: "",
+      city: "",
+      state: ""
+    },
+    workType: "REMOTO",
     availability: {},
     categories: [],
   },
@@ -53,23 +59,24 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
 
   selectAllServices: async () => {},
 
-  addCategory: (category: string) =>
+  addCategory: (categoryId: string) =>
     set((state) => {
-      const categoryAlreadyExists = state.categoriesSelected.includes(category);
+      const categoryIdAlreadyExists =
+        state.categoriesSelected.includes(categoryId);
 
-      if (categoryAlreadyExists) {
+      if (categoryIdAlreadyExists) {
         return {
           ...state,
           categoriesSelected: state.categoriesSelected.filter(
-            (c) => c !== category,
+            (c) => c !== categoryId,
           ),
         };
       }
 
-      if (!categoryAlreadyExists && state.categoriesSelected.length < 3) {
+      if (!categoryIdAlreadyExists && state.categoriesSelected.length < 3) {
         return {
           ...state,
-          categoriesSelected: [...state.categoriesSelected, category],
+          categoriesSelected: [...state.categoriesSelected, categoryId],
         };
       }
 
@@ -78,7 +85,6 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
 
   selectServiceById: (id: string) => {
     const state = get();
-
     return state.service;
   },
 
@@ -136,12 +142,25 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
     })),
 
   setPrice: (price) =>
-    set((state) => ({
-      service: {
-        ...state.service,
-        price,
-      },
-    })),
+    set((state) => {
+      const priceWithoutSpace = price.trim();
+      const number = parseFloat(priceWithoutSpace);
+
+      if (isNaN(number)) {
+        return {
+          ...state,
+          error: "Erro: Entrada inválida",
+        };
+      }
+
+      return {
+        service: {
+          ...state.service,
+          price,
+        },
+        error: null,
+      };
+    }),
 
   setDescription: (description) =>
     set((state) => ({
