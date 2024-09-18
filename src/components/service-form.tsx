@@ -5,7 +5,7 @@ import { useUserStore } from "@/context/use-user-store";
 import { cn } from "@/lib/utils";
 import { Availability, Location, Service } from "@/types/service";
 import { ArrowRightLeft, EllipsisVertical, House } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { LocationPanel } from "./location-manager";
 import { Button } from "./ui/button";
@@ -66,6 +66,16 @@ export function ServiceForm({ service, form }: ServiceFormProps) {
   const [locationValue, setLocationValue] = useState<Location>(
     location || locationDefaultFormatted,
   );
+
+  useEffect(() => {
+    if (service.id) {
+      setLocationValue({
+        id: service.location.city,
+        city: service.location.city,
+        state: service.location.state,
+      });
+    }
+  }, [service]);
 
   const {
     setTitle,
@@ -179,7 +189,7 @@ export function ServiceForm({ service, form }: ServiceFormProps) {
                   {service.location.city.length > 0 ? (
                     <div className="flex items-center gap-2">
                       <Input
-                        value={`${locationValue.city}, ${location.state}`}
+                        value={`${locationValue.city}, ${locationValue.state}`}
                       />
                       <LocationPanel.Trigger>
                         <Button className="size-9 px-2">

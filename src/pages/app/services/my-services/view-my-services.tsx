@@ -70,7 +70,7 @@ export function ViewMyServices() {
       description: "Serviço de limpeza de casa",
       price: "100",
       location: {
-        id: "52822843-b273-50b1-868f-17e476df0800",
+        id: "ca1c92eb-713b-5c26-a27a-a84b0accff790",
         city: "São Paulo",
         state: "SP",
       },
@@ -81,12 +81,12 @@ export function ViewMyServices() {
       categories: ["limpeza", "Doméstico"],
     },
     {
-      id: "52822843-b273-50b1-868f-17e476df0800",
+      id: "42fd0b0b-9d61-5c1b-aad8-856327c020a8",
       title: "Limpeza",
       description: "Serviço de limpeza de casa",
       price: "100",
       location: {
-        id: "52822843-b273-50b1-868f-17e476df0800",
+        id: "463cabd1-5f06-50a7-adfc-2bf93dad25cc",
         city: "Rio de Janeiro",
         state: "RJ",
       },
@@ -98,12 +98,12 @@ export function ViewMyServices() {
     },
 
     {
-      id: "52822843-b273-50b1-868f-17e476df0800",
+      id: "d922d97f-2a26-570d-a96c-ca4a51a72d5b",
       title: "Limpeza",
       description: "Serviço de limpeza de casa",
       price: "100",
       location: {
-        id: "52822843-b273-50b1-868f-17e476df0800",
+        id: "ef1c1f97-bb0c-5e58-9f07-292924d094aa",
         city: "Minas Gerais",
         state: "MG",
       },
@@ -126,7 +126,7 @@ export function ViewMyServices() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {services.map((service) => (
-          <Card key={service.title} className="flex flex-col">
+          <Card key={service.id} className="flex flex-col">
             <CardHeader>
               <CardTitle>{service.title}</CardTitle>
               <CardDescription>{service.description}</CardDescription>
