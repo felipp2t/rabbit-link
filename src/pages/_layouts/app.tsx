@@ -69,7 +69,7 @@ export function AppLayout() {
           <Header.SearchInput className="mx-auto my-4 w-96" />
         </HiddenInTheSMScreen>
 
-        <div className="mt-16 flex flex-1 flex-col gap-4 p-8 pt-6">
+        <div className="flex flex-1 flex-col gap-4">
           <Outlet />
         </div>
       </div>

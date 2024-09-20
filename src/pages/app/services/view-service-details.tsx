@@ -50,7 +50,7 @@ export function Service() {
   };
 
   return (
-    <main className="container mx-auto py-8">
+    <main className="container mx-auto p-8">
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2">
           <h1 className="mb-4 text-3xl font-bold tracking-tight text-primary">

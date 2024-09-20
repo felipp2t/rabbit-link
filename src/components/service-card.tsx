@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 
 export function ServiceCard() {
   return (
-    <Card className="mx-auto flex h-80 w-72 max-w-md shrink-0 flex-col md:w-80 xl:w-full">
+    <Card className="mx-auto flex h-80 w-72 max-w-md shrink-0 flex-col md:w-80 xl:w-96">
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar className="size-12 md:size-14 xl:size-16">
           <AvatarImage

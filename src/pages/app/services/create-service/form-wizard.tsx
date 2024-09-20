@@ -69,7 +69,7 @@ export function FormWizard() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto mt-36">
       <h1 className="mb-6 text-center text-3xl font-bold text-primary">
         Criar Novo Serviço
       </h1>

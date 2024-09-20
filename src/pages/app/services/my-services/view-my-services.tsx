@@ -31,6 +31,7 @@ import { useServiceStore } from "@/context/use-service-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Briefcase, Clock, MapPin, PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 import { Service } from "../../../../types/service";
 import {
   ServiceDetailsSchema,
@@ -116,17 +117,19 @@ export function ViewMyServices() {
   ];
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto px-8 pt-36">
       <header className="mb-6 flex flex-col items-center justify-between gap-5 md:flex-row">
-        <h1 className="text-center text-2xl font-bold">
+        <h1 className="relative text-center text-2xl font-bold before:absolute before:-bottom-2 before:left-0 before:h-1 before:w-20 before:rounded-full before:bg-primary before:content-['']">
           Meus Serviços Cadastrados
         </h1>
-        <Button>
-          <PlusCircle className="mr-2 size-4" /> Adicionar Novo Serviço
+        <Button asChild>
+          <Link to="/criar-servico">
+            <PlusCircle className="mr-2 size-4" /> Adicionar Novo Serviço
+          </Link>
         </Button>
       </header>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {services.map((service) => (
           <Card key={service.id} className="flex flex-col">
             <CardHeader>
