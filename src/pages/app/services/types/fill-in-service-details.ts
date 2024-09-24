@@ -7,7 +7,6 @@ export const ServiceDetailsValidation = z.object({
     .min(20, "A descrição deve ter no mínimo 20 caracteres"),
   price: z.string().min(1, "O preço deve ser maior que 0"),
   location: z.string().min(5, "A localização deve ter no mínimo 5 caracteres"),
-  availability: z.object({}),
   workType: z.enum(["PRESENCIAL", "REMOTO", "HÍBRIDO"]),
 });
 

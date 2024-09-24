@@ -1,11 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { useServiceStore } from "@/context/use-service-store";
-import { Briefcase, Clock, MapPin } from "lucide-react";
+import { Briefcase, MapPin } from "lucide-react";
 
 export function ConfirmDetails() {
   const {
     categoriesSelected,
-    service: { title, price, description, location, workType, availability },
+    service: { title, price, description, location, workType },
   } = useServiceStore();
 
   return (
@@ -49,22 +49,6 @@ export function ConfirmDetails() {
         <p className="flex items-center">
           <Briefcase className="mr-2 h-4 w-4" />
           {workType!.toUpperCase()}
-        </p>
-      </div>
-
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Disponibilidade</h3>
-        <p className="flex items-center">
-          <div className="flex flex-col gap-2">
-            {Object.entries(availability).map(([day, time]) => (
-              <p key={day} className="flex items-center">
-                <Clock className="mr-2 h-4 w-4" />
-                {time
-                  ? `${day}: ${time.start} - ${time.end}`
-                  : `${day}: Indisponível`}
-              </p>
-            ))}
-          </div>
         </p>
       </div>
     </div>

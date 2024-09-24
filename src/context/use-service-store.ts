@@ -1,4 +1,4 @@
-import { Service, Location } from "@/types/service";
+import { Location, Service } from "@/types/service";
 import { create } from "zustand";
 
 interface ServiceState {
@@ -14,8 +14,6 @@ interface ServiceState {
   selectAllServices: () => Promise<void>;
   selectServiceById: (id: string) => Service;
 
-  handleDayToggle: (day: string) => void;
-  handleTimeChange: (day: string, type: "start" | "end", value: string) => void;
   handleNext: () => void;
   handlePrevious: () => void;
 
@@ -42,10 +40,9 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
     location: {
       id: "",
       city: "",
-      state: ""
+      state: "",
     },
     workType: "REMOTO",
-    availability: {},
     categories: [],
   },
 
@@ -99,39 +96,6 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
       step: state.step - 1,
     }));
   },
-
-  handleDayToggle: (day) =>
-    set((state) => {
-      const isAvailable = state.service.availability[day] !== undefined;
-
-      const updatedAvailability = { ...state.service.availability };
-      if (isAvailable) {
-        delete updatedAvailability[day];
-      } else {
-        updatedAvailability[day] = { start: "09:00", end: "17:00" };
-      }
-
-      return {
-        service: {
-          ...state.service,
-          availability: updatedAvailability,
-        },
-      };
-    }),
-
-  handleTimeChange: (day: string, type: "start" | "end", value: string) =>
-    set((state) => ({
-      service: {
-        ...state.service,
-        availability: {
-          ...state.service.availability,
-          [day]: {
-            ...(state.service.availability[day] || { start: "", end: "" }),
-            [type]: value,
-          },
-        },
-      },
-    })),
 
   setTitle: (title) =>
     set((state) => ({
@@ -195,9 +159,7 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
       !state.service.title ||
       !state.service.description ||
       !state.service.price ||
-      !state.service.location ||
-      (state.service.availability &&
-        Object.keys(state.service.availability).length === 0);
+      !state.service.location
 
     const isValid = state.step === 2 && isAnyFieldEmpty;
 

@@ -1,7 +1,3 @@
-export interface Availability {
-  [key: string]: { start: string; end: string } | null;
-}
-
 export interface Location {
   id: string;
   city: string;
@@ -16,5 +12,4 @@ export interface Service {
   price: string;
   location: Location;
   workType: "REMOTO" | "PRESENCIAL" | "HÍBRIDO";
-  availability: Availability;
 }

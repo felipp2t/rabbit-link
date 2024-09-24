@@ -1,27 +1,15 @@
 import { LocationManagerModal } from "@/components/location-manager-modal";
-import { daysOfWeek } from "@/constants/days-of-weeks";
 import { useServiceStore } from "@/context/use-service-store";
 import { useUserStore } from "@/context/use-user-store";
 import { cn } from "@/lib/utils";
-import { Availability, Location, Service } from "@/types/service";
+import { Location, Service } from "@/types/service";
 import { ArrowRightLeft, EllipsisVertical, House } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { LocationPanel } from "./location-manager";
 import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import {
   Select,
   SelectContent,
@@ -42,7 +30,6 @@ interface ServiceFormProps {
       price: string;
       location: string;
       workType: "REMOTO" | "PRESENCIAL" | "HÍBRIDO";
-      availability: Availability;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any,
@@ -77,15 +64,8 @@ export function ServiceForm({ service, form }: ServiceFormProps) {
     }
   }, [service]);
 
-  const {
-    setTitle,
-    setPrice,
-    setDescription,
-    setWorkType,
-    setLocation,
-    handleDayToggle,
-    handleTimeChange,
-  } = useServiceStore();
+  const { setTitle, setPrice, setDescription, setWorkType, setLocation } =
+    useServiceStore();
 
   function handleSelectAddressToService(addressId: string) {
     const addressFound = user.addresses.find(({ id }) => id === addressId);
@@ -274,100 +254,6 @@ export function ServiceForm({ service, form }: ServiceFormProps) {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Controller
-          control={form.control}
-          name="availability"
-          render={() => (
-            <FormItem className="col-span-2">
-              <FormLabel htmlFor="availability">Disponibilidade</FormLabel>
-              <FormControl>
-                <Dialog>
-                  {Object.keys(service.availability).length > 0 ? (
-                    <div className="flex flex-col space-y-4">
-                      <ul className="list-disc space-y-1 pl-5">
-                        {Object.entries(service.availability)
-                          .filter(([, time]) => time && time.start && time.end)
-                          .sort(
-                            ([dayA], [dayB]) =>
-                              daysOfWeek.indexOf(dayA) -
-                              daysOfWeek.indexOf(dayB),
-                          )
-                          .map(
-                            ([day, time]: [
-                              string,
-                              { start: string; end: string } | null,
-                            ]) => (
-                              <li key={day}>
-                                {day}: {time?.start} - {time?.end}
-                              </li>
-                            ),
-                          )}
-                      </ul>
-                      <DialogTrigger asChild>
-                        <Button className="w-full border bg-background text-foreground hover:bg-secondary">
-                          Mudar disponibilidade
-                        </Button>
-                      </DialogTrigger>
-                    </div>
-                  ) : (
-                    <DialogTrigger asChild>
-                      <Button className="w-full border bg-background text-foreground hover:bg-secondary">
-                        Selecionar Disponibilidade
-                      </Button>
-                    </DialogTrigger>
-                  )}
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Set Your Availability</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      {daysOfWeek.map((day) => (
-                        <div key={day} className="flex items-center space-x-4">
-                          <Checkbox
-                            id={day}
-                            checked={!!service.availability[day]}
-                            onCheckedChange={() => handleDayToggle(day)}
-                          />
-                          <Label htmlFor={day} className="flex-grow">
-                            {day}
-                          </Label>
-                          {service.availability[day] && (
-                            <>
-                              <Input
-                                type="time"
-                                value={service.availability[day]?.start}
-                                onChange={(e) =>
-                                  handleTimeChange(day, "start", e.target.value)
-                                }
-                                className="w-24"
-                              />
-                              <span>até</span>
-                              <Input
-                                type="time"
-                                value={service.availability[day]?.end}
-                                onChange={(e) =>
-                                  handleTimeChange(day, "end", e.target.value)
-                                }
-                                className="w-24"
-                              />
-                            </>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button>Fechar</Button>
-                      </DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
               </FormControl>
               <FormMessage />
             </FormItem>
