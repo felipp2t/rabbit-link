@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import {
   ServiceDetailsSchema,
   ServiceDetailsValidation,
-} from "../_types/fill-in-service-details";
+} from "../types/fill-in-service-details";
 
 interface FillInServiceDetailsProps {
   onlySearch?: boolean;

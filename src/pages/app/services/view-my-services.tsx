@@ -32,11 +32,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Briefcase, Clock, MapPin, PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { Service } from "../../../../types/service";
+import { Service } from "../../../types/service";
 import {
   ServiceDetailsSchema,
   ServiceDetailsValidation,
-} from "../_types/fill-in-service-details";
+} from "./types/fill-in-service-details";
 
 export function ViewMyServices() {
   const { selectServiceById } = useServiceStore();

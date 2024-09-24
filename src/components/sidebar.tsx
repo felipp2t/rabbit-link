@@ -1,6 +1,5 @@
 import { CalendarPlus, Home, Layers, Search } from "lucide-react";
 import { Navigation } from "./navigation";
-import { UserDropdown } from "./user-dropdown";
 
 export function Sidebar() {
   return (
@@ -36,10 +35,6 @@ export function Sidebar() {
           </Navigation.NavMain>
         </Navigation.Nav>
       </Navigation.Main>
-
-      <Navigation.Footer>
-        <UserDropdown />
-      </Navigation.Footer>
     </Navigation.Root>
   );
 }

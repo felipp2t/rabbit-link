@@ -1,4 +1,3 @@
-import { Footer } from "./footer";
 import { Header } from "./header";
 import { WebsiteName } from "./website-name";
 import { Main } from "./main";
@@ -21,5 +20,4 @@ export const Navigation = {
   NavMain,
   NavLink,
   NavLinkTitle,
-  Footer,
 };

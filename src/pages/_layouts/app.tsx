@@ -6,11 +6,21 @@ import { LocationPanel } from "@/components/location-manager";
 import { LocationManagerModal } from "@/components/location-manager-modal";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useUserStore } from "@/context/use-user-store";
 import { getUser } from "@/http/user/get-user";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Rabbit } from "lucide-react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
+import ProfilePicture from "/imagem-perfil.jpg";
 
 export function AppLayout() {
   const { setUser } = useUserStore();
@@ -42,9 +52,11 @@ export function AppLayout() {
         <Header.Root className="flex items-center justify-between">
           <Header.Group>
             <Header.SidebarIcon />
-            <Header.Logo>
-              <Rabbit className="size-8 text-muted" />
-            </Header.Logo>
+            <BlockInTheXLScreen>
+              <Header.Logo>
+                <Rabbit className="size-8 text-muted" />
+              </Header.Logo>
+            </BlockInTheXLScreen>
           </Header.Group>
 
           <BlockInTheSMScreen className="w-1/3">
@@ -62,6 +74,32 @@ export function AppLayout() {
               <LocationManagerModal />
             </LocationPanel.Root>
             <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="overflow-hidden rounded-full"
+                >
+                  <img
+                    src={ProfilePicture}
+                    alt="Avatar"
+                    className="size-9 overflow-hidden rounded-full"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel className="">Olá, Felipe</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">
+                  <Link to="/editar-perfil">Configurações</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </Header.Group>
         </Header.Root>
 
