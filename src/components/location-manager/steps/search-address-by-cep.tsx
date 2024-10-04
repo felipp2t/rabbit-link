@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { cepValidation } from "@/types/cep";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
 
@@ -18,7 +19,6 @@ export interface SearchAddressByCepProps {
 export function SearchAddressByCep({
   handleSearchAddress,
   show = false,
-
 }: SearchAddressByCepProps) {
   const form = useForm<CepSchema>({
     resolver: zodResolver(cepValidation),
@@ -51,7 +51,14 @@ export function SearchAddressByCep({
 
           <DialogFooter>
             <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Buscando..." : "Buscar"}
+              {form.formState.isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 animate-spin" />
+                  <span>Buscando...</span>
+                </>
+              ) : (
+                "Buscar"
+              )}
             </Button>
           </DialogFooter>
         </form>

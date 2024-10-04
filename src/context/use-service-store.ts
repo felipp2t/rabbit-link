@@ -1,29 +1,36 @@
-import { Location, Service } from "@/types/service";
+import { Category } from "@/types/category";
+import { ServiceRequest } from "@/types/service/service-request";
+import { Location } from "@/types/service/service-request";
 import { create } from "zustand";
 
 interface ServiceState {
-  service: Service;
-  categoriesSelected: string[];
-  addCategory: (categoryId: string) => void;
+  service: ServiceRequest;
+
+  addCategory: (categories: Category) => void;
 
   step: number;
+  setStep: (step: number) => void;
 
   createService: () => Promise<void>;
   deleteService: (id: string) => Promise<void>;
-  editService: (id: string, service: Omit<Service, "id">) => Promise<void>;
+  editService: (id: string, service: Omit<ServiceRequest, "id">) => Promise<void>;
   selectAllServices: () => Promise<void>;
-  selectServiceById: (id: string) => Service;
+  selectServiceById: (id: string) => ServiceRequest;
 
   handleNext: () => void;
   handlePrevious: () => void;
 
   setTitle: (title: string) => void;
-  setPrice: (price: string) => void;
+  setMinimumPrice: (minimum: string) => void;
+  setMaximunPrice: (maximum: string) => void;
   setDescription: (description: string) => void;
   setLocation: (location: Location) => void;
-  setWorkType: (workType: "REMOTO" | "PRESENCIAL" | "HÍBRIDO") => void;
+  setWorkType: (workType: "REMOTE" | "ONSIDE" | "HYBRID") => void;
+  setApplicationDeadline: (aplicationDeadline: string) => void;
 
   handleValidationToNextStep: () => boolean;
+
+  formatBrazilNumber: (price: string) => number;
 
   error: string | null;
 }
@@ -36,14 +43,18 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
     id: "",
     title: "",
     description: "",
-    price: "",
+    price: {
+      minimum: "",
+      maximum: "",
+    },
     location: {
       id: "",
       city: "",
       state: "",
     },
-    workType: "REMOTO",
+    workType: "REMOTE",
     categories: [],
+    applicationDeadline: "",
   },
 
   categoriesSelected: [],
@@ -52,28 +63,33 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
 
   deleteService: async (id: string) => {},
 
-  editService: async (id: string, service: Omit<Service, "id">) => {},
+  editService: async (id: string, service: Omit<ServiceRequest, "id">) => {},
 
   selectAllServices: async () => {},
 
-  addCategory: (categoryId: string) =>
+  addCategory: (category) =>
     set((state) => {
-      const categoryIdAlreadyExists =
-        state.categoriesSelected.includes(categoryId);
+      const categoryIdAlreadyExists = state.service.categories.find(
+        (c) => c.id === category.id,
+      );
 
       if (categoryIdAlreadyExists) {
         return {
-          ...state,
-          categoriesSelected: state.categoriesSelected.filter(
-            (c) => c !== categoryId,
-          ),
+          service: {
+            ...state.service,
+            categories: state.service.categories.filter(
+              (c) => c.id !== category.id,
+            ),
+          },
         };
       }
 
-      if (!categoryIdAlreadyExists && state.categoriesSelected.length < 3) {
+      if (!categoryIdAlreadyExists && state.service.categories.length < 3) {
         return {
-          ...state,
-          categoriesSelected: [...state.categoriesSelected, categoryId],
+          service: {
+            ...state.service,
+            categories: [...state.service.categories, category],
+          },
         };
       }
 
@@ -105,26 +121,27 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
       },
     })),
 
-  setPrice: (price) =>
-    set((state) => {
-      const priceWithoutSpace = price.trim();
-      const number = parseFloat(priceWithoutSpace);
-
-      if (isNaN(number)) {
-        return {
-          ...state,
-          error: "Erro: Entrada inválida",
-        };
-      }
-
-      return {
-        service: {
-          ...state.service,
-          price,
+  setMaximunPrice: (maximum) =>
+    set((state) => ({
+      service: {
+        ...state.service,
+        price: {
+          ...state.service.price,
+          maximum,
         },
-        error: null,
-      };
-    }),
+      },
+    })),
+
+  setMinimumPrice: (minimum) =>
+    set((state) => ({
+      service: {
+        ...state.service,
+        price: {
+          ...state.service.price,
+          minimum,
+        },
+      },
+    })),
 
   setDescription: (description) =>
     set((state) => ({
@@ -150,19 +167,40 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
       },
     })),
 
+  setApplicationDeadline: (applicationDeadline) =>
+    set((state) => ({
+      service: {
+        ...state.service,
+        applicationDeadline,
+      },
+    })),
+
   handleValidationToNextStep: () => {
     const state = get();
 
-    if (state.categoriesSelected.length === 0) return true;
+    if (state.service.categories.length === 0) return true;
 
     const isAnyFieldEmpty =
       !state.service.title ||
       !state.service.description ||
       !state.service.price ||
-      !state.service.location
+      !state.service.location ||
+      !state.service.workType;
 
     const isValid = state.step === 2 && isAnyFieldEmpty;
 
     return isValid;
   },
+
+  formatBrazilNumber: (price: string) => {
+    let formattedPrice = price.replace(/\./g, "");
+
+    formattedPrice = formattedPrice.replace(",", ".");
+
+    console.log(parseFloat(formattedPrice));
+
+    return parseFloat(formattedPrice);
+  },
+
+  setStep: (step) => set({ step }),
 }));

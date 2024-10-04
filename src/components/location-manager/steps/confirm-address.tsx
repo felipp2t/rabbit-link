@@ -4,9 +4,11 @@ import { Form, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { createAddress } from "@/http/address/create-address";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Dispatch, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -19,16 +21,18 @@ export interface ConfirmAddressProps {
     street: string;
   };
   show: boolean;
+  setStep: Dispatch<React.SetStateAction<number>>;
 }
 
 export function ConfirmAddress({
   location,
   show = false,
+  setStep,
 }: ConfirmAddressProps) {
   const [isHouse, setIsHouse] = useState(true);
 
   const addressValidation = z.object({
-    type: z.enum(["CASA", "APARTAMENTO"]),
+    type: z.enum(["HOUSE", "APARTAMENT"]),
     address: z.object({
       cep: z.string(),
       state: z.string(),
@@ -45,7 +49,7 @@ export function ConfirmAddress({
 
   const form = useForm<AddressSchema>({
     defaultValues: {
-      type: "CASA",
+      type: "HOUSE",
       address: {
         cep: location.cep,
         state: location.state,
@@ -53,8 +57,8 @@ export function ConfirmAddress({
         neighborhood: location.neighborhood,
         street: location.street,
         number: Number(),
-        apartamentName: undefined,
-        apartamentNumber: undefined,
+        apartamentName: "",
+        apartamentNumber: Number(),
       },
     },
     resolver: zodResolver(addressValidation),
@@ -62,7 +66,7 @@ export function ConfirmAddress({
 
   useEffect(() => {
     form.reset({
-      type: "CASA",
+      type: "HOUSE",
       address: {
         cep: location.cep,
         state: location.state,
@@ -76,8 +80,37 @@ export function ConfirmAddress({
     });
   }, [location, form]);
 
-  function handleConfirmAddress(data: AddressSchema) {
-    console.log(data);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: createAddressMutation } = useMutation({
+    mutationKey: ["create-address"],
+    mutationFn: async (data: AddressSchema) => await createAddress(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["get-addresses"] });
+    },
+  });
+
+  async function handleConfirmAddress(data: AddressSchema) {
+    try {
+      await createAddressMutation({
+        type: data.type,
+        address: {
+          cep: data.address.cep,
+          city: data.address.city,
+          neighborhood: data.address.neighborhood,
+          state: data.address.state,
+          street: data.address.street,
+          number: data.address.number,
+          apartamentName: data.address.apartamentName,
+          apartamentNumber: data.address.apartamentNumber,
+        },
+      });
+
+      console.log("ENTROU");
+      setStep(1);
+    } catch (error) {
+      console.error("ERRO POHA" + error);
+    }
   }
 
   return (
@@ -179,16 +212,16 @@ export function ConfirmAddress({
             />
 
             <RadioGroup
-              defaultValue="CASA"
+              defaultValue="HOUSE"
               className="col-span-8"
-              onValueChange={(value) => setIsHouse(value === "CASA")}
+              onValueChange={(value) => setIsHouse(value === "HOUSE")}
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="CASA" id="casa" />
+                <RadioGroupItem value="HOUSE" id="casa" />
                 <Label htmlFor="casa">Casa</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="APARTAMENTO" id="apartamento" />
+                <RadioGroupItem value="APARTMENT" id="apartamento" />
                 <Label htmlFor="apartamento">Condomínio</Label>
               </div>
               {form.formState.errors.type && (

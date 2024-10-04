@@ -2,9 +2,17 @@ import { cn } from "@/lib/utils";
 import { DialogDescription } from "../ui/dialog";
 import { LocationGenericProps } from "./types/location-generic-props";
 
-export function Desription({ children, className }: LocationGenericProps) {
+interface DescriptionProps {
+  show: boolean;
+}
+
+export function Description({
+  children,
+  className,
+  show = false,
+}: LocationGenericProps<DescriptionProps>) {
   return (
-    <DialogDescription className={cn("", className)}>
+    <DialogDescription className={cn("hidden", className, show && "block")}>
       {children}
     </DialogDescription>
   );

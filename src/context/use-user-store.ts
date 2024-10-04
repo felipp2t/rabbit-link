@@ -1,50 +1,19 @@
-import { Address } from "@/types/address";
+import { AddressRequest } from "@/types/address/address-request";
 import { User } from "@/types/user";
-import { v4 as uuidv4 } from "uuid";
 import { create } from "zustand";
 
 interface UserState {
   user: User;
 
   setUser: (user: User) => void;
-  addAddress: (address: Address) => void;
-  updateAddresses: (addresses: Address[]) => void;
+  addAddress: (address: AddressRequest) => void;
+  setAddresses: (addresses: AddressRequest[]) => void;
+  updateAddresses: (addresses: AddressRequest[]) => void;
 }
 
 export const useUserStore = create<UserState>()((set) => ({
   user: {
-    addresses: [
-      {
-        id: uuidv4(),
-        type: "APARTAMENTO",
-        address: {
-          cep: "88804100",
-          city: "Criciúma",
-          state: "SC",
-          neighborhood: "Santa Bárbara",
-          street: "Rua Argemiro Frutuoso",
-          number: 385,
-        },
-        apartmentNumber: 201,
-        apartamentName: "Edifício Santa Bárbara",
-        selected: true,
-      },
-      {
-        id: uuidv4(),
-        type: "CASA",
-        address: {
-          cep: "88804100",
-          neighborhood: "Santa Bárbara",
-          city: "Siderópolis",
-          state: "SC",
-          street: "Rua Argemiro Frutuoso",
-          number: 385,
-        },
-        apartmentNumber: 201,
-        apartamentName: "Edifício Santa Bárbara",
-        selected: false,
-      },
-    ],
+    addresses: [],
     birthDate: "",
     cpf: "",
     description: null,
@@ -56,9 +25,27 @@ export const useUserStore = create<UserState>()((set) => ({
     profilePicture: null,
     role: "",
     token: "",
+    id: "",
   },
 
-  setUser: (user) => set({ ...user, user }),
+  setUser: (user) =>
+    set((state) => ({
+      user: {
+        ...state.user,
+        token: user.token,
+        name: user.name,
+        email: user.email,
+        addresses: user.addresses,
+        birthDate: user.birthDate,
+        cpf: user.cpf,
+        phone: user.phone,
+        description: user.description,
+        password: user.password,
+        profession: user.profession,
+        profilePicture: user.profilePicture,
+        role: user.role,
+      },
+    })),
 
   addAddress: (newAddress) =>
     set((state) => ({
@@ -69,6 +56,9 @@ export const useUserStore = create<UserState>()((set) => ({
           : [newAddress],
       },
     })),
+
+  setAddresses: (addresses) =>
+    set((state) => ({ user: { ...state.user, addresses } })),
 
   updateAddresses: (addresses) =>
     set((state) => ({ user: { ...state.user, addresses } })),

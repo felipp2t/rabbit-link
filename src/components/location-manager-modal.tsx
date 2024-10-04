@@ -18,10 +18,10 @@ export function LocationManagerModal() {
     street: "",
   });
 
-  const { user, updateAddresses } = useUserStore();
+  const { user } = useUserStore();
 
   function verifyHasAnyAddress() {
-    return (user.addresses ?? []).length > 0;
+    return Array.isArray(user.addresses) && user.addresses.length > 0;
   }
 
   async function handleSearchAddress(data: CepSchema) {
@@ -34,29 +34,23 @@ export function LocationManagerModal() {
     setStep((prev) => prev + 1);
   }
 
-  function handleChangeAddressLikeDefault(addressId: string) {
-    const updatedAddresses = user.addresses?.map((address) => ({
-      ...address,
-      selected: address.id === addressId,
-    }))
-    
-    updateAddresses(updatedAddresses)
-  }
-
   return (
     <LocationPanel.Content>
       <LocationPanel.Header>
-        <LocationPanel.TitleWithoutContent
-          show={!verifyHasAnyAddress() && step === 1}
-        >
+        <LocationPanel.Title show={!verifyHasAnyAddress() && step === 1}>
           Parece que você não tem endereço cadastrado
-        </LocationPanel.TitleWithoutContent>
+        </LocationPanel.Title>
 
-        <LocationPanel.TitleSelectAddress show={verifyHasAnyAddress() && step === 1}>
+        <LocationPanel.Title show={step === 1}>
           Selecione um endereço
-        </LocationPanel.TitleSelectAddress>
+        </LocationPanel.Title>
 
-        <LocationPanel.TitleSearchAddress show={verifyHasAnyAddress() && step === 2}>
+        <LocationPanel.Description show={step === 1}>
+          Adicione um endereço para facilitar o seu serviço. Você pode adicionar
+          no máximo 3 endereços.
+        </LocationPanel.Description>
+
+        <LocationPanel.Title show={step === 2}>
           <div className="flex items-center gap-4">
             <ChevronLeft
               className="size-6 cursor-pointer text-primary"
@@ -64,11 +58,9 @@ export function LocationManagerModal() {
             />
             <h2>Adicionar endereço</h2>
           </div>
-        </LocationPanel.TitleSearchAddress>
+        </LocationPanel.Title>
 
-        <LocationPanel.TitleConfirmAddress
-          show={verifyHasAnyAddress() && step === 3}
-        >
+        <LocationPanel.Title show={verifyHasAnyAddress() && step === 3}>
           <div className="flex items-center gap-4">
             <ChevronLeft
               className="size-6 cursor-pointer text-primary"
@@ -76,22 +68,27 @@ export function LocationManagerModal() {
             />
             <h2>Confirme o endereço</h2>
           </div>
-        </LocationPanel.TitleConfirmAddress>
+        </LocationPanel.Title>
       </LocationPanel.Header>
 
       <LocationPanel.SelectAddress show={verifyHasAnyAddress() && step === 1}>
-        {user.addresses?.map((address) => (
-          <LocationPanel.AddressCard
-            key={address.id}
-            className={cn("", address.selected && "ring-2 ring-primary")}
-            onClick={() => handleChangeAddressLikeDefault(address.id)}
-          >
+        {user.addresses.map((address) => (
+          <LocationPanel.AddressCard key={address.id}>
             <House className="size-6" />
             <LocationPanel.CardContent>
-              <LocationPanel.CardType>{address.type}</LocationPanel.CardType>
+              <LocationPanel.CardType>
+                {address.type === "APARTAMENT" ? (
+                  <span className="capitalize">
+                    {address.type}, ap. {address.apartmentNumber}
+                  </span>
+                ) : (
+                  <span className="capitalize">{address.type}</span>
+                )}
+              </LocationPanel.CardType>
               <LocationPanel.CardStreetNumber>
                 <span>
-                  {address.address.street}, {address.address.state}
+                  {address.address.street}, {address.address.number},{" "}
+                  {address.address.city} - {address.address.state}
                 </span>
               </LocationPanel.CardStreetNumber>
             </LocationPanel.CardContent>
@@ -104,6 +101,7 @@ export function LocationManagerModal() {
         <LocationPanel.Footer>
           <Button
             className="semibold"
+            disabled={user.addresses.length >= 3}
             onClick={() => setStep((prev) => prev + 1)}
           >
             Adicione um novo endereço
@@ -113,12 +111,13 @@ export function LocationManagerModal() {
 
       <LocationPanel.SearchAddressByCep
         handleSearchAddress={handleSearchAddress}
-        show={verifyHasAnyAddress() && step === 2}
+        show={step === 2}
       />
 
       <LocationPanel.ConfirmAddress
         location={addressFounded}
-        show={verifyHasAnyAddress() && step === 3}
+        show={step === 3}
+        setStep={setStep}
       />
 
       <LocationPanel.Footer

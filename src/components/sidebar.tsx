@@ -1,4 +1,10 @@
-import { CalendarPlus, Home, Layers, Search } from "lucide-react";
+import {
+  CalendarPlus,
+  Home,
+  Layers,
+  MessageCircleIcon,
+  Search,
+} from "lucide-react";
 import { Navigation } from "./navigation";
 
 export function Sidebar() {
@@ -31,6 +37,11 @@ export function Sidebar() {
             <Navigation.NavLink to="/criar-servico">
               <CalendarPlus className="size-4" />
               <Navigation.NavLinkTitle>Criar serviço</Navigation.NavLinkTitle>
+            </Navigation.NavLink>
+
+            <Navigation.NavLink to="/conversas">
+              <MessageCircleIcon className="size-4" />
+              <Navigation.NavLinkTitle>Conversas</Navigation.NavLinkTitle>
             </Navigation.NavLink>
           </Navigation.NavMain>
         </Navigation.Nav>

@@ -4,6 +4,7 @@ import { CardOptions } from "./card/card-options";
 import { CardStreetNumber } from "./card/card-street-number";
 import { CardType } from "./card/card-type";
 import { Content } from "./content";
+import { Description } from "./description";
 import { Footer } from "./footer";
 import { Header } from "./header";
 import { Root } from "./root";
@@ -11,10 +12,8 @@ import { StepButton } from "./step-button";
 import { ConfirmAddress } from "./steps/confirm-address";
 import { SearchAddressByCep } from "./steps/search-address-by-cep";
 import { SelectAddress } from "./steps/select-address";
-import { TitleConfirmAddress } from "./titles/title-confirm-address";
-import { TitleSearchAddress } from "./titles/title-search-address";
-import { TitleSelectAddress } from "./titles/title-select";
-import { TitleWithoutContent } from "./titles/title-without-content";
+import { Title } from "./title";
+
 import { Trigger } from "./trigger";
 
 export const LocationPanel = {
@@ -22,20 +21,16 @@ export const LocationPanel = {
   Trigger,
   Content,
   Header,
-  TitleWithoutContent,
-  TitleSelectAddress,
-  TitleSearchAddress,
-  TitleConfirmAddress,
+  Title,
+  Description,
   SelectAddress,
   SearchAddressByCep,
   ConfirmAddress,
   StepButton,
-
   AddressCard,
   CardType,
   CardContent,
   CardStreetNumber,
   CardOptions,
-
   Footer,
 };

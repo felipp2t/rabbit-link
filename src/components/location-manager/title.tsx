@@ -1,16 +1,16 @@
 import { cn } from "@/lib/utils";
-import { LocationGenericProps } from "../types/location-generic-props";
 import { DialogTitle } from "@/components/ui/dialog";
+import { LocationGenericProps } from "./types/location-generic-props";
 
-export interface TitleWithoutContentProps {
+export interface TitleProps {
   show: boolean;
 }
 
-export function TitleWithoutContent({
+export function Title({
   children,
   className,
   show = false,
-}: LocationGenericProps<TitleWithoutContentProps>) {
+}: LocationGenericProps<TitleProps>) {
   return (
     <DialogTitle className={cn("hidden", show && "block", className)}>
       {children}
