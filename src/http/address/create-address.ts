@@ -1,11 +1,8 @@
 import { AddressRequest } from "@/types/address/address-request";
 
 export async function createAddress(address: Omit<AddressRequest, "id">) {
-  console.log(address);
 
   const token = localStorage.getItem("token");
-
-  console.log(token);
 
   if (!token) {
     throw new Error("Token not found");
@@ -25,8 +22,8 @@ export async function createAddress(address: Omit<AddressRequest, "id">) {
       postalCode: address.address.cep,
       houseNumber: Number(address.address.number),
       type: address.type,
-      apartmentNumber: Number(address.apartmentNumber),
-      apartmentName: address.apartamentName,
+      apartmentNumber: address.apartmentNumber,
+      apartmentName: address.apartmentName,
     }),
   });
 }

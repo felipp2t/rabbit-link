@@ -1,6 +1,6 @@
 export interface AddressRequest {
   id: string;
-  type: "HOUSE" | "APARTAMENT";
+  type: "HOUSE" | "APARTMENT";
   address: {
     cep: string;
     city: string;
@@ -10,5 +10,5 @@ export interface AddressRequest {
     number: number;
   };
   apartmentNumber?: number;
-  apartamentName?: string;
+  apartmentName?: string;
 }
