@@ -1,3 +1,4 @@
+import { AlertDialogToDeleteAddress } from "./alert-dialog-to-delete-address";
 import { CancelButton } from "./cancel-button";
 import { AddressCard } from "./card/address-card";
 import { CardContent } from "./card/card-content";
@@ -35,4 +36,5 @@ export const LocationPanel = {
   CardStreetNumber,
   CardOptions,
   Footer,
+  AlertDialogToDeleteAddress
 };

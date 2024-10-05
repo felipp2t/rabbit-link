@@ -1,10 +1,12 @@
 import { LocationPanel } from "@/components/location-manager";
 import { useUserStore } from "@/context/use-user-store";
 import { Replace } from "@/helpers/replace";
+import { deleteAddress } from "@/http/address/delete-address";
 import { cn } from "@/lib/utils";
 import { AddressRequest } from "@/types/address/address-request";
 import { CepSchema } from "@/types/cep";
 import { handleAddressSearch } from "@/utils/address";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, EllipsisVertical, House, Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
@@ -18,6 +20,10 @@ import {
 
 export function LocationManagerModal() {
   const [step, setStep] = useState(1);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [addressIdToDelete, setAddressIdToDelete] = useState<string | null>(
+    null,
+  );
   const [addressDetails, setAddressDetails] = useState<
     Replace<AddressRequest, { id?: string; type?: "HOUSE" | "APARTMENT" }>
   >({
@@ -42,7 +48,7 @@ export function LocationManagerModal() {
   const handleSubmit = async (data: CepSchema) =>
     await handleAddressSearch({ data, setAddressDetails, setStep });
 
-  const haldeActiveEditMode = (addressId: string) => {
+  const searchUserAddress = (addressId: string) => {
     const foundAddress = user.addresses.find(
       (address) => address.id === addressId,
     );
@@ -66,6 +72,28 @@ export function LocationManagerModal() {
       apartmentNumber: foundAddress.apartmentNumber,
     });
     setStep(3);
+  };
+
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: deleteAddressMutation } = useMutation({
+    mutationKey: ["delete-address", addressIdToDelete],
+    mutationFn: async ({ addressIdToDelete }: { addressIdToDelete: string }) =>
+      await deleteAddress(addressIdToDelete),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["get-addresses"] });
+    },
+  });
+
+  const handleDeleteAddress = () => {
+    setIsDialogOpen(false);
+    setAddressIdToDelete(null);
+
+    if (!addressIdToDelete) {
+      return;
+    }
+
+    deleteAddressMutation({ addressIdToDelete });
   };
 
   return (
@@ -149,7 +177,7 @@ export function LocationManagerModal() {
                   )}
                 </LocationPanel.CardType>
                 <LocationPanel.CardStreetNumber>
-                  <p className="text-sm line-clamp-2">
+                  <p className="line-clamp-2 text-sm">
                     {address.address.street}, {address.address.number},{" "}
                     {address.address.city} - {address.address.state}
                   </p>
@@ -163,13 +191,19 @@ export function LocationManagerModal() {
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       className="cursor-pointer"
-                      onClick={() => haldeActiveEditMode(address.id)}
+                      onClick={() => searchUserAddress(address.id)}
                     >
                       <Pen className="mr-2 size-4" />
                       <p>Editar</p>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => {
+                        setAddressIdToDelete(address.id);
+                        setIsDialogOpen(true);
+                      }}
+                    >
                       <Trash className="mr-2 size-4" />
                       <p>Excluir</p>
                     </DropdownMenuItem>
@@ -178,6 +212,12 @@ export function LocationManagerModal() {
               </Button>
             </LocationPanel.AddressCard>
           ))}
+
+        <LocationPanel.AlertDialogToDeleteAddress
+          handleDeleteAddress={handleDeleteAddress}
+          isDialogOpen={isDialogOpen}
+          setIsDialogOpen={setIsDialogOpen}
+        />
 
         <LocationPanel.Footer>
           <LocationPanel.CancelButton onClick={() => setStep(1)}>
