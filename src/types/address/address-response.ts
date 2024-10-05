@@ -6,7 +6,7 @@ export interface AddressResponse {
   street: string;
   postalCode: string;
   houseNumber: number;
-  type: "HOUSE" | "APARTAMENT";
+  type: "HOUSE" | "APARTMENT";
   apartmentNumber?: number 
   apartmentName?: string
 }

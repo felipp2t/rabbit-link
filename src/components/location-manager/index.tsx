@@ -1,3 +1,4 @@
+import { CancelButton } from "./cancel-button";
 import { AddressCard } from "./card/address-card";
 import { CardContent } from "./card/card-content";
 import { CardOptions } from "./card/card-options";
@@ -27,6 +28,7 @@ export const LocationPanel = {
   SearchAddressByCep,
   ConfirmAddress,
   StepButton,
+  CancelButton,
   AddressCard,
   CardType,
   CardContent,

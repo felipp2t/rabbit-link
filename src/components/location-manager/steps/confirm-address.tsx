@@ -1,295 +1,315 @@
 import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Form, FormItem } from "@/components/ui/form";
+import { DialogClose, DialogFooter } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Replace } from "@/helpers/replace";
 import { createAddress } from "@/http/address/create-address";
+import { updateAddress } from "@/http/address/update-address";
 import { cn } from "@/lib/utils";
+import { AddressRequest } from "@/types/address/address-request";
+import {
+  AddressSchema,
+  addressValidation,
+} from "@/types/address/address-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dispatch, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+import { Loader2 } from "lucide-react";
+import React, { Dispatch, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
-export interface ConfirmAddressProps {
-  location: {
-    cep: string;
-    city: string;
-    neighborhood: string;
-    state: string;
-    street: string;
-  };
+interface ConfirmAddressProps {
+  addressDetails: Replace<
+    AddressRequest,
+    { id?: string; type?: "HOUSE" | "APARTMENT" }
+  >;
   show: boolean;
   setStep: Dispatch<React.SetStateAction<number>>;
 }
 
-export function ConfirmAddress({
-  location,
-  show = false,
-  setStep,
-}: ConfirmAddressProps) {
-  const [isHouse, setIsHouse] = useState(true);
+export const ConfirmAddress = React.memo(
+  ({ addressDetails, show = false, setStep }: ConfirmAddressProps) => {
+    const [isHouse, setIsHouse] = useState(addressDetails.type === "HOUSE");
 
-  const addressValidation = z.object({
-    type: z.enum(["HOUSE", "APARTAMENT"]),
-    address: z.object({
-      cep: z.string(),
-      state: z.string(),
-      city: z.string(),
-      neighborhood: z.string(),
-      street: z.string(),
-      number: z.coerce.number(),
-      apartamentName: z.string().optional(),
-      apartamentNumber: z.coerce.number().optional(),
-    }),
-  });
-
-  type AddressSchema = z.infer<typeof addressValidation>;
-
-  const form = useForm<AddressSchema>({
-    defaultValues: {
-      type: "HOUSE",
-      address: {
-        cep: location.cep,
-        state: location.state,
-        city: location.city,
-        neighborhood: location.neighborhood,
-        street: location.street,
-        number: Number(),
-        apartamentName: "",
-        apartamentNumber: Number(),
+    const form = useForm<AddressSchema>({
+      defaultValues: {
+        type: addressDetails.type ?? "HOUSE",
+        address: {
+          cep: addressDetails.address.cep,
+          state: addressDetails.address.state,
+          city: addressDetails.address.city,
+          neighborhood: addressDetails.address.neighborhood,
+          street: addressDetails.address.street,
+          number: addressDetails.address.number,
+        },
+        apartmentName: addressDetails.apartmentName ?? "",
+        apartmentNumber: addressDetails.apartmentNumber ?? 0,
       },
-    },
-    resolver: zodResolver(addressValidation),
-  });
+      resolver: zodResolver(addressValidation),
+    });
 
-  useEffect(() => {
-    form.reset({
-      type: "HOUSE",
-      address: {
-        cep: location.cep,
-        state: location.state,
-        city: location.city,
-        neighborhood: location.neighborhood,
-        street: location.street,
-        number: Number(),
-        apartamentName: undefined,
-        apartamentNumber: undefined,
+    useEffect(() => {
+      form.reset({
+        type: addressDetails.type,
+        address: {
+          cep: addressDetails.address.cep,
+          state: addressDetails.address.state,
+          city: addressDetails.address.city,
+          neighborhood: addressDetails.address.neighborhood,
+          street: addressDetails.address.street,
+          number: addressDetails.address.number,
+        },
+        apartmentName: addressDetails.apartmentName ?? "",
+        apartmentNumber: addressDetails.apartmentNumber ?? 0,
+      });
+      setIsHouse(addressDetails.type === "HOUSE");
+    }, [addressDetails, form]);
+
+    const queryClient = useQueryClient();
+
+    const { mutateAsync: createAddressMutation } = useMutation({
+      mutationKey: ["create-address"],
+      mutationFn: async (data: AddressSchema) => await createAddress(data),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["get-addresses"] });
       },
     });
-  }, [location, form]);
 
-  const queryClient = useQueryClient();
-
-  const { mutateAsync: createAddressMutation } = useMutation({
-    mutationKey: ["create-address"],
-    mutationFn: async (data: AddressSchema) => await createAddress(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["get-addresses"] });
-    },
-  });
-
-  async function handleConfirmAddress(data: AddressSchema) {
-    try {
-      await createAddressMutation({
-        type: data.type,
-        address: {
-          cep: data.address.cep,
-          city: data.address.city,
-          neighborhood: data.address.neighborhood,
-          state: data.address.state,
-          street: data.address.street,
-          number: data.address.number,
-          apartamentName: data.address.apartamentName,
-          apartamentNumber: data.address.apartamentNumber,
-        },
-      });
-
-      console.log("ENTROU");
-      setStep(1);
-    } catch (error) {
-      console.error("ERRO POHA" + error);
+    interface UpdateAddressMutation {
+      address: AddressSchema;
+      addressId: string;
     }
-  }
 
-  return (
-    <div className={cn("hidden", show && "block")}>
-      <Form {...form}>
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={form.handleSubmit(handleConfirmAddress)}
-        >
-          <div className="grid grid-cols-8 gap-x-4 gap-y-6">
-            <Controller
-              control={form.control}
-              name="address.state"
-              render={({ field }) => (
-                <FormItem className="col-span-3">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="state" className="">
-                      Estado
-                    </Label>
-                    <Input {...field} id="state" />
-                  </div>
-                  {form.formState.errors.address?.state && (
-                    <span>{form.formState.errors.address.state.message}</span>
-                  )}
-                </FormItem>
-              )}
-            />
+    const { mutateAsync: updateAddressMutation } = useMutation({
+      mutationKey: ["update-address"],
+      mutationFn: async ({ address, addressId }: UpdateAddressMutation) =>
+        await updateAddress({ address, addressId }),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["get-addresses"] });
+      },
+    });
 
-            <Controller
-              control={form.control}
-              name="address.neighborhood"
-              render={({ field }) => (
-                <FormItem className="col-span-4 col-start-1">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="neighborhood">Bairro</Label>
-                    <Input {...field} id="neighborhood" />
-                  </div>
-                  {form.formState.errors.address?.neighborhood && (
-                    <span>
-                      {form.formState.errors.address.neighborhood.message}
-                    </span>
-                  )}
-                </FormItem>
-              )}
-            />
+    const handleCreateAddress = async (data: AddressSchema) =>
+      await createAddressMutation(data);
 
-            <Controller
-              control={form.control}
-              name="address.city"
-              render={({ field }) => (
-                <FormItem className="col-span-4">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="city" className="">
-                      Cidade
-                    </Label>
-                    <Input {...field} id="city" />
-                  </div>
-                  {form.formState.errors.address?.city && (
-                    <span>{form.formState.errors.address.city.message}</span>
-                  )}
-                </FormItem>
-              )}
-            />
+    const handleUpdateAddress = async ({
+      address,
+      addressId,
+    }: UpdateAddressMutation) =>
+      await updateAddressMutation({ address, addressId });
 
-            <Controller
-              control={form.control}
-              name="address.street"
-              render={({ field }) => (
-                <FormItem className="col-span-5">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="street" className="">
-                      Rua
-                    </Label>
-                    <Input {...field} id="street" />
-                  </div>
-                  {form.formState.errors.address?.street && (
-                    <span>{form.formState.errors.address.street.message}</span>
-                  )}
-                </FormItem>
-              )}
-            />
+    async function handleConfirmAddress(data: AddressSchema) {
+      try {
+        if (addressDetails.id) {
+          await handleUpdateAddress({
+            address: data,
+            addressId: addressDetails.id,
+          });
+          setStep(1);
+          return;
+        }
 
-            <Controller
-              control={form.control}
-              name="address.number"
-              render={({ field }) => (
-                <FormItem className="col-span-3">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="number" className="">
-                      Nº
-                    </Label>
-                    <Input {...field} id="number" />
-                  </div>
-                  {form.formState.errors.address?.number && (
-                    <span>{form.formState.errors.address.number.message}</span>
-                  )}
-                </FormItem>
-              )}
-            />
+        await handleCreateAddress(data);
+        setStep(1);
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
-            <RadioGroup
-              defaultValue="HOUSE"
-              className="col-span-8"
-              onValueChange={(value) => setIsHouse(value === "HOUSE")}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="HOUSE" id="casa" />
-                <Label htmlFor="casa">Casa</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="APARTMENT" id="apartamento" />
-                <Label htmlFor="apartamento">Condomínio</Label>
-              </div>
-              {form.formState.errors.type && (
-                <span>{form.formState.errors.type.message}</span>
-              )}
-            </RadioGroup>
+    return (
+      <div className={cn("hidden", show && "block")}>
+        <Form {...form}>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit(handleConfirmAddress)}
+          >
+            <div className="grid grid-cols-8 gap-x-4 gap-y-6">
+              <FormField
+                control={form.control}
+                name="address.street"
+                render={({ field }) => (
+                  <FormItem className="col-span-8">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="street">Rua</Label>
+                      <FormControl>
+                        <Input {...field} id="street" />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Controller
-              control={form.control}
-              name="address.apartamentName"
-              render={({ field }) => (
-                <FormItem className="col-span-5">
-                  <div className="flex items-center gap-2">
-                    <Label
-                      htmlFor="address.apartamentName"
-                      className={cn("", isHouse && "text-muted-foreground")}
-                    >
-                      Nome do Condomínio
-                    </Label>
-                    <Input
-                      disabled={isHouse}
-                      {...field}
-                      id="address.apartamentName"
-                    />
-                  </div>
-                  {form.formState.errors.address?.apartamentName && (
-                    <span>
-                      {form.formState.errors.address.apartamentName.message}
-                    </span>
-                  )}
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="address.neighborhood"
+                render={({ field }) => (
+                  <FormItem className="col-span-4 col-start-1">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="neighborhood">Bairro</Label>
+                      <FormControl>
+                        <Input {...field} id="neighborhood" />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Controller
-              control={form.control}
-              name="address.apartamentNumber"
-              render={({ field }) => (
-                <FormItem className="col-span-3">
-                  <div className="flex items-center gap-2">
-                    <Label
-                      htmlFor="address.apartamentNumber"
-                      className={cn("", isHouse && "text-muted-foreground")}
-                    >
-                      Nº
-                    </Label>
-                    <Input
-                      disabled={isHouse}
-                      {...field}
-                      id="address.apartamentNumber"
-                    />
-                  </div>
-                  {form.formState.errors.address?.apartamentNumber && (
-                    <span>
-                      {form.formState.errors.address.apartamentNumber.message}
-                    </span>
-                  )}
-                </FormItem>
-              )}
-            />
-          </div>
-          <DialogFooter>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Salvando..." : "Confirmar"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </Form>
-    </div>
-  );
-}
+              <FormField
+                control={form.control}
+                name="address.city"
+                render={({ field }) => (
+                  <FormItem className="col-span-4">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="city">Cidade</Label>
+                      <FormControl>
+                        <Input {...field} id="city" />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="address.state"
+                render={({ field }) => (
+                  <FormItem className="col-span-4">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="state">Estado</Label>
+                      <FormControl>
+                        <Input {...field} id="state" />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="address.number"
+                render={({ field }) => (
+                  <FormItem className="col-span-4">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="number">Nº</Label>
+                      <FormControl>
+                        <Input {...field} id="number" />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <RadioGroup
+                    value={field.value}
+                    className="col-span-8"
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setIsHouse(value === "HOUSE");
+                    }}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="HOUSE" id="HOUSE" />
+                      <Label htmlFor="HOUSE">Casa</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="APARTMENT" id="APARTMENT" />
+                      <Label htmlFor="APARTMENT">Apartamento</Label>
+                    </div>
+                    <FormMessage />
+                  </RadioGroup>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="apartmentName"
+                render={({ field }) => (
+                  <FormItem className="col-span-5">
+                    <div className="flex items-center gap-2">
+                      <Label
+                        htmlFor="apartmentName"
+                        className={cn("", isHouse && "text-muted-foreground")}
+                      >
+                        Nome do Condomínio
+                      </Label>
+                      <FormControl>
+                        <Input
+                          id="apartmentName"
+                          disabled={isHouse}
+                          {...field}
+                        />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="apartmentNumber"
+                render={({ field }) => (
+                  <FormItem className="col-span-3">
+                    <div className="flex items-center gap-2">
+                      <Label
+                        htmlFor="apartmentNumber"
+                        className={cn("", isHouse && "text-muted-foreground")}
+                      >
+                        Nº
+                      </Label>
+                      <FormControl>
+                        <Input
+                          disabled={isHouse}
+                          {...field}
+                          id="apartmentNumber"
+                        />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => setStep(1)}
+                  className={cn("text-gray-500")}
+                >
+                  Cancelar
+                </Button>
+              </DialogClose>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 animate-spin" />
+                    <p>"Salvando..."</p>
+                  </>
+                ) : (
+                  "Confirmar"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </div>
+    );
+  },
+);

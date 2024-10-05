@@ -1,56 +1,97 @@
 import { LocationPanel } from "@/components/location-manager";
 import { useUserStore } from "@/context/use-user-store";
+import { Replace } from "@/helpers/replace";
 import { cn } from "@/lib/utils";
+import { AddressRequest } from "@/types/address/address-request";
 import { CepSchema } from "@/types/cep";
-import { searchLocationByCEP } from "@/utils/serch-location-by-cep";
-import { ChevronLeft, EllipsisVertical, House } from "lucide-react";
+import { handleAddressSearch } from "@/utils/address";
+import { ChevronLeft, EllipsisVertical, House, Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export function LocationManagerModal() {
   const [step, setStep] = useState(1);
-  const [addressFounded, setAddressFounded] = useState({
-    cep: "",
-    city: "",
-    neighborhood: "",
-    service: "",
-    state: "",
-    street: "",
+  const [addressDetails, setAddressDetails] = useState<
+    Replace<AddressRequest, { id?: string; type?: "HOUSE" | "APARTMENT" }>
+  >({
+    apartmentName: "",
+    apartmentNumber: 0,
+    id: "",
+    address: {
+      cep: "",
+      city: "",
+      neighborhood: "",
+      number: 0,
+      state: "",
+      street: "",
+    },
   });
 
   const { user } = useUserStore();
 
-  function verifyHasAnyAddress() {
-    return Array.isArray(user.addresses) && user.addresses.length > 0;
-  }
+  const verifyHasAnyAddress = () =>
+    Array.isArray(user.addresses) && user.addresses.length > 0;
 
-  async function handleSearchAddress(data: CepSchema) {
-    const location = await searchLocationByCEP(data.cep);
-    setAddressFounded({
-      ...location,
-      street: location.street.replace("Rua ", ""),
+  const handleSubmit = async (data: CepSchema) =>
+    await handleAddressSearch({ data, setAddressDetails, setStep });
+
+  const haldeActiveEditMode = (addressId: string) => {
+    const foundAddress = user.addresses.find(
+      (address) => address.id === addressId,
+    );
+
+    if (!foundAddress) {
+      return;
+    }
+
+    setAddressDetails({
+      id: foundAddress.id,
+      type: foundAddress.type,
+      address: {
+        cep: foundAddress.address.cep,
+        city: foundAddress.address.city,
+        neighborhood: foundAddress.address.neighborhood,
+        number: foundAddress.address.number,
+        state: foundAddress.address.state,
+        street: foundAddress.address.street,
+      },
+      apartmentName: foundAddress.apartmentName,
+      apartmentNumber: foundAddress.apartmentNumber,
     });
-
-    setStep((prev) => prev + 1);
-  }
+    setStep(3);
+  };
 
   return (
     <LocationPanel.Content>
-      <LocationPanel.Header>
-        <LocationPanel.Title show={!verifyHasAnyAddress() && step === 1}>
+      <LocationPanel.Header show={!verifyHasAnyAddress() && step === 1}>
+        <LocationPanel.Title>
           Parece que você não tem endereço cadastrado
         </LocationPanel.Title>
-
-        <LocationPanel.Title show={step === 1}>
-          Selecione um endereço
-        </LocationPanel.Title>
-
-        <LocationPanel.Description show={step === 1}>
-          Adicione um endereço para facilitar o seu serviço. Você pode adicionar
-          no máximo 3 endereços.
+        <LocationPanel.Description>
+          Para continuar, adicione um ou mais endereços à sua conta. Isso
+          ajudará a agilizar seu processo de serviço e garantir que suas
+          solicitações sejam atendidas de forma eficiente.
         </LocationPanel.Description>
+      </LocationPanel.Header>
 
-        <LocationPanel.Title show={step === 2}>
+      <LocationPanel.Header show={verifyHasAnyAddress() && step === 1}>
+        <LocationPanel.Title>Seus endereços</LocationPanel.Title>
+
+        <LocationPanel.Description>
+          Veja e gerencie seus endereços cadastrados. Adicione, edite ou remova
+          endereços para garantir entregas precisas e rápidas.
+        </LocationPanel.Description>
+      </LocationPanel.Header>
+
+      <LocationPanel.Header show={step === 2}>
+        <LocationPanel.Title>
           <div className="flex items-center gap-4">
             <ChevronLeft
               className="size-6 cursor-pointer text-primary"
@@ -59,8 +100,14 @@ export function LocationManagerModal() {
             <h2>Adicionar endereço</h2>
           </div>
         </LocationPanel.Title>
+        <LocationPanel.Description className="ml-10">
+          Nesta etapa, você poderá inserir um novo endereço. Certifique-se de
+          que a informação esteja correta
+        </LocationPanel.Description>
+      </LocationPanel.Header>
 
-        <LocationPanel.Title show={verifyHasAnyAddress() && step === 3}>
+      <LocationPanel.Header show={!addressDetails.id && step === 3}>
+        <LocationPanel.Title>
           <div className="flex items-center gap-4">
             <ChevronLeft
               className="size-6 cursor-pointer text-primary"
@@ -69,39 +116,76 @@ export function LocationManagerModal() {
             <h2>Confirme o endereço</h2>
           </div>
         </LocationPanel.Title>
+        <LocationPanel.Description className="ml-10">
+          Verifique as informações do endereço que você acabou de adicionar. É
+          importante garantir que tudo esteja correto antes de finalizar o
+          processo.
+        </LocationPanel.Description>
+      </LocationPanel.Header>
+
+      <LocationPanel.Header show={!!addressDetails.id && step === 3}>
+        <LocationPanel.Title>
+          <h2>Atualize seu endreço</h2>
+        </LocationPanel.Title>
+        <LocationPanel.Description>
+          Revise as informações do endereço atual e faça as alterações
+          necessárias para mantê-las sempre atualizadas.
+        </LocationPanel.Description>
       </LocationPanel.Header>
 
       <LocationPanel.SelectAddress show={verifyHasAnyAddress() && step === 1}>
-        {user.addresses.map((address) => (
-          <LocationPanel.AddressCard key={address.id}>
-            <House className="size-6" />
-            <LocationPanel.CardContent>
-              <LocationPanel.CardType>
-                {address.type === "APARTAMENT" ? (
-                  <span className="capitalize">
-                    {address.type}, ap. {address.apartmentNumber}
-                  </span>
-                ) : (
-                  <span className="capitalize">{address.type}</span>
-                )}
-              </LocationPanel.CardType>
-              <LocationPanel.CardStreetNumber>
-                <span>
-                  {address.address.street}, {address.address.number},{" "}
-                  {address.address.city} - {address.address.state}
-                </span>
-              </LocationPanel.CardStreetNumber>
-            </LocationPanel.CardContent>
-            <Button className="group grid size-8 place-content-center self-start bg-transparent p-0 text-muted-foreground hover:bg-transparent">
-              <EllipsisVertical className="size-6 self-start group-hover:text-muted" />
-            </Button>
-          </LocationPanel.AddressCard>
-        ))}
+        {user?.addresses?.length > 0 &&
+          user.addresses.map((address) => (
+            <LocationPanel.AddressCard key={address.id}>
+              <House className="size-6" />
+              <LocationPanel.CardContent>
+                <LocationPanel.CardType>
+                  {address.type === "APARTMENT" ? (
+                    <span className="capitalize">
+                      {address.type}, ap. {address.apartmentNumber}
+                    </span>
+                  ) : (
+                    <span className="capitalize">{address.type}</span>
+                  )}
+                </LocationPanel.CardType>
+                <LocationPanel.CardStreetNumber>
+                  <p className="text-sm line-clamp-2">
+                    {address.address.street}, {address.address.number},{" "}
+                    {address.address.city} - {address.address.state}
+                  </p>
+                </LocationPanel.CardStreetNumber>
+              </LocationPanel.CardContent>
+              <Button className="group grid size-8 place-content-center self-start bg-transparent p-0 hover:bg-transparent">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <EllipsisVertical className="size-6 self-start border-none text-secondary-foreground hover:text-primary" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => haldeActiveEditMode(address.id)}
+                    >
+                      <Pen className="mr-2 size-4" />
+                      <p>Editar</p>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Trash className="mr-2 size-4" />
+                      <p>Excluir</p>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </Button>
+            </LocationPanel.AddressCard>
+          ))}
 
         <LocationPanel.Footer>
+          <LocationPanel.CancelButton onClick={() => setStep(1)}>
+            Cancelar
+          </LocationPanel.CancelButton>
           <Button
             className="semibold"
-            disabled={user.addresses.length >= 3}
+            disabled={user?.addresses?.length >= 3}
             onClick={() => setStep((prev) => prev + 1)}
           >
             Adicione um novo endereço
@@ -110,12 +194,13 @@ export function LocationManagerModal() {
       </LocationPanel.SelectAddress>
 
       <LocationPanel.SearchAddressByCep
-        handleSearchAddress={handleSearchAddress}
+        handleSearchAddress={handleSubmit}
         show={step === 2}
+        setStep={setStep}
       />
 
       <LocationPanel.ConfirmAddress
-        location={addressFounded}
+        addressDetails={addressDetails}
         show={step === 3}
         setStep={setStep}
       />
@@ -126,6 +211,9 @@ export function LocationManagerModal() {
           !verifyHasAnyAddress() && step === 1 && "block",
         )}
       >
+        <LocationPanel.CancelButton onClick={() => setStep(1)}>
+          Cancelar
+        </LocationPanel.CancelButton>
         <Button
           className="semibold"
           onClick={() => setStep((prev) => prev + 1)}

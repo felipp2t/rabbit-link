@@ -1,7 +1,7 @@
 import { CepSchema } from "@/types/cep";
 
 import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
+import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -13,12 +13,14 @@ import { PatternFormat } from "react-number-format";
 
 export interface SearchAddressByCepProps {
   show: boolean;
+  setStep: (number: number) => void
   handleSearchAddress: (data: CepSchema) => void;
 }
 
 export function SearchAddressByCep({
   handleSearchAddress,
   show = false,
+  setStep
 }: SearchAddressByCepProps) {
   const form = useForm<CepSchema>({
     resolver: zodResolver(cepValidation),
@@ -50,6 +52,15 @@ export function SearchAddressByCep({
           />
 
           <DialogFooter>
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                onClick={() => setStep(1)}
+                className={cn("text-gray-500")}
+              >
+                Cancelar
+              </Button>
+            </DialogClose>
             <Button type="submit" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? (
                 <>
