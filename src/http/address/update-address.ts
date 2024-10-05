@@ -27,8 +27,8 @@ export async function updateAddress({
       street: address.address.street,
       postalCode: address.address.cep,
       houseNumber: address.address.number,
-      apartmentNumber: address.apartmentNumber,
-      apartmentName: address.apartmentName,
+      apartmentNumber: address.apartmentNumber || null,
+      apartmentName: address.apartmentName || null,
     }),
   });
 }
