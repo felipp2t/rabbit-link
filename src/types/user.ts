@@ -1,6 +1,7 @@
-import { Address } from "./address";
+import { AddressRequest } from "./address/address-request";
 
 export interface User {
+  id: string;
   profilePicture: string | null;
   name: string;
   email: string;
@@ -10,7 +11,7 @@ export interface User {
   phone: string;
   profession: string | null;
   description: string | null;
-  addresses: Address[];
+  addresses: AddressRequest[];
   birthDate: string;
   role: string;
 }

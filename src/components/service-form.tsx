@@ -1,15 +1,27 @@
-import { LocationManagerModal } from "@/components/location-manager-modal";
 import { useServiceStore } from "@/context/use-service-store";
 import { useUserStore } from "@/context/use-user-store";
 import { cn } from "@/lib/utils";
-import { Location, Service } from "@/types/service";
-import { ArrowRightLeft, EllipsisVertical, House } from "lucide-react";
+import { ServiceDetailsSchema } from "@/pages/app/services/types/fill-in-service-details";
+import { Location, ServiceRequest } from "@/types/service/service-request";
+import { format } from "date-fns";
+import { pt } from "date-fns/locale";
+import { ArrowRightLeft, CalendarIcon, House } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Controller, UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
+import { NumericFormat } from "react-number-format";
 import { LocationPanel } from "./location-manager";
 import { Button } from "./ui/button";
-import { Form, FormControl, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { Calendar } from "./ui/calendar";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
 import { Input } from "./ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import {
   Select,
   SelectContent,
@@ -22,243 +34,304 @@ import { Textarea } from "./ui/textarea";
 
 interface ServiceFormProps {
   onlySearch?: boolean;
-  service: Service;
+  service: ServiceRequest;
   form: UseFormReturn<
     {
       title: string;
       description: string;
-      price: string;
-      location: string;
-      workType: "REMOTO" | "PRESENCIAL" | "HÍBRIDO";
+      price: {
+        minimum: string;
+        maximum: string;
+      };
+      location: {
+        id: string;
+        city: string;
+        state: string;
+      };
+      workType: "REMOTE" | "ONSITE" | "HYBRID";
+      deadline: string;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any,
     undefined
   >;
+
+  handleOnSubmit: (data: ServiceDetailsSchema) => void;
 }
 
-export function ServiceForm({ service, form }: ServiceFormProps) {
-  const {
-    service: { location },
-  } = useServiceStore();
+export function ServiceForm({
+  service,
+  form,
+  handleOnSubmit,
+}: ServiceFormProps) {
   const { user } = useUserStore();
 
-  const locationDefault = user.addresses.find(({ selected }) => selected);
-  const locationDefaultFormatted = {
-    id: locationDefault?.id ?? "",
-    city: locationDefault?.address.city ?? "",
-    state: locationDefault?.address.state ?? "",
-  };
+  const { handlePrevious } = useServiceStore();
 
-  const [locationValue, setLocationValue] = useState<Location>(
-    location || locationDefaultFormatted,
-  );
+  const [locationValue, setLocationValue] = useState<Location>({
+    id: service.location.id || user.addresses[0].id,
+    city: service.location.city || user.addresses[0].address.city,
+    state: service.location.state || user.addresses[0].address.state,
+  });
 
   useEffect(() => {
-    if (service.id) {
-      setLocationValue({
-        id: service.location.city,
-        city: service.location.city,
-        state: service.location.state,
-      });
-    }
-  }, [service]);
-
-  const { setTitle, setPrice, setDescription, setWorkType, setLocation } =
-    useServiceStore();
-
-  function handleSelectAddressToService(addressId: string) {
-    const addressFound = user.addresses.find(({ id }) => id === addressId);
-    if (addressFound) {
-      const addressSeleted: Location = {
-        id: addressFound.id,
-        city: addressFound.address.city,
-        state: addressFound.address.state,
-      };
-
-      setLocationValue(addressSeleted);
-      setLocation(addressSeleted);
-    }
-  }
+    form.setValue("location", locationValue);
+    form.setValue("title", form.getValues("title"));
+    form.setValue("description", form.getValues("description"));
+    form.setValue("price.maximum", form.getValues("price.maximum"));
+    form.setValue("price.minimum", form.getValues("price.minimum"));
+    form.setValue("workType", form.getValues("workType"));
+    form.setValue("deadline", form.getValues("deadline"));
+  }, [locationValue, form]);
 
   return (
     <Form {...form}>
-      <form className="grid grid-cols-4 gap-4">
-        <Controller
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel htmlFor="title">Título</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  id="title"
-                  value={field.value ?? service.title}
-                  placeholder="título do serviço"
-                  onChange={(e) => {
-                    field.onChange(e);
-                    setTitle(e.target.value);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form className="space-y-6" onSubmit={form.handleSubmit(handleOnSubmit)}>
+        <div className="grid grid-cols-4 gap-4">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem className="col-span-4 sm:col-span-2">
+                <FormLabel htmlFor="title">Título</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    id="title"
+                    value={field.value ?? service.title}
+                    placeholder="título do serviço"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Controller
-          control={form.control}
-          name="price"
-          render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel htmlFor="price">Preço</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  id="price"
-                  value={field.value ?? service.price}
-                  placeholder="preço do serviço"
-                  onChange={(e) => {
-                    field.onChange(e);
-                    setPrice(e.target.value);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="price.minimum"
+            render={({ field }) => (
+              <FormItem className="col-span-2 sm:col-span-1">
+                <FormLabel htmlFor="price.minimum">Preço Mínimo</FormLabel>
+                <FormControl>
+                  <NumericFormat
+                    {...field}
+                    value={field.value ?? service.price.minimum}
+                    step="1"
+                    min="1"
+                    max="10000"
+                    allowLeadingZeros
+                    customInput={Input}
+                    id="price.minimum"
+                    defaultValue={field.value ?? service.price.minimum}
+                    placeholder="min. 1"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Controller
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem className="col-span-4">
-              <FormLabel htmlFor="description">Descrição</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  value={field.value ?? service.description}
-                  placeholder="descrição do serviço"
-                  onChange={(e) => {
-                    field.onChange(e);
-                    setDescription(e.target.value);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="price.maximum"
+            render={({ field }) => (
+              <FormItem className="col-span-2 sm:col-span-1">
+                <FormLabel htmlFor="price.maximum">Preço Máximo</FormLabel>
+                <FormControl>
+                  <NumericFormat
+                    {...field}
+                    value={field.value ?? service.price.maximum}
+                    step="1"
+                    min="1"
+                    max="10000"
+                    allowLeadingZeros
+                    customInput={Input}
+                    id="price.maximum"
+                    defaultValue={field.value ?? service.price.maximum}
+                    placeholder="max. 10.000"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Controller
-          control={form.control}
-          name="location"
-          render={() => (
-            <FormItem className="col-span-2">
-              <FormLabel htmlFor="location">
-                {service.location.city.length > 0 ? (
-                  <span>Localização</span>
-                ) : (
-                  <span>Você ainda não possui uma localização.</span>
-                )}
-              </FormLabel>
-              <FormControl>
-                <LocationPanel.Root>
-                  {service.location.city.length > 0 ? (
-                    <div className="flex items-center gap-2">
-                      <Input
-                        value={`${locationValue.city}, ${locationValue.state}`}
-                      />
-                      <LocationPanel.Trigger>
-                        <Button className="size-9 px-2">
-                          <ArrowRightLeft className="size-6" />
-                        </Button>
-                      </LocationPanel.Trigger>
-                      <LocationPanel.Content>
-                        <LocationPanel.Header>
-                          <LocationPanel.TitleSelectAddress show>
-                            Selecione um endereço
-                          </LocationPanel.TitleSelectAddress>
-                        </LocationPanel.Header>
-                        {user.addresses?.map((address) => (
-                          <LocationPanel.AddressCard
-                            key={address.id}
-                            className={cn(
-                              "",
-                              address.id === locationValue.id &&
-                                "ring-2 ring-primary",
-                            )}
-                            onClick={() =>
-                              handleSelectAddressToService(address.id)
-                            }
-                          >
-                            <House className="size-6" />
-                            <LocationPanel.CardContent>
-                              <LocationPanel.CardType>
-                                {address.type}
-                              </LocationPanel.CardType>
-                              <LocationPanel.CardStreetNumber>
-                                <span>
-                                  {address.address.street},{" "}
-                                  {address.address.state}
-                                </span>
-                              </LocationPanel.CardStreetNumber>
-                            </LocationPanel.CardContent>
-                            <Button className="group grid size-8 place-content-center self-start bg-transparent p-0 text-muted-foreground hover:bg-transparent">
-                              <EllipsisVertical className="size-6 self-start group-hover:text-muted" />
-                            </Button>
-                          </LocationPanel.AddressCard>
-                        ))}
-                      </LocationPanel.Content>
-                    </div>
-                  ) : (
-                    <>
-                      <LocationPanel.Trigger>
-                        <Button className="w-full border bg-background text-foreground hover:bg-secondary">
-                          Selecionar Localização
-                        </Button>
-                      </LocationPanel.Trigger>
-                      <LocationManagerModal />
-                    </>
-                  )}
-                </LocationPanel.Root>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="col-span-4">
+                <FormLabel htmlFor="description">Descrição</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    value={field.value ?? service.description}
+                    placeholder="descrição do serviço"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Controller
-          control={form.control}
-          name="workType"
-          render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel htmlFor="workType">Tipo de Trabalho</FormLabel>
-              <FormControl>
-                <Select
-                  {...field}
-                  onValueChange={(value) => {
-                    setWorkType(value as "PRESENCIAL" | "REMOTO" | "HÍBRIDO");
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selectione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="REMOTO">Remoto</SelectItem>
-                      <SelectItem value="PRESENCIAL">Presencial</SelectItem>
-                      <SelectItem value="HÍBRIDO">Híbrido</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => {
+              return (
+                <FormItem className="col-span-4 sm:col-span-2">
+                  <FormLabel htmlFor="location">Localização</FormLabel>
+                  <FormControl>
+                    <LocationPanel.Root>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          {...field}
+                          id="location"
+                          value={`${locationValue.city}, ${locationValue.state}`}
+                          readOnly
+                        />
+                        <LocationPanel.Trigger>
+                          <Button className="size-9 px-2">
+                            <ArrowRightLeft className="size-6" />
+                          </Button>
+                        </LocationPanel.Trigger>
+                        <LocationPanel.Content>
+                          <LocationPanel.Header show>
+                            <LocationPanel.Title>
+                              Selecione um endereço
+                            </LocationPanel.Title>
+                          </LocationPanel.Header>
+                          {user.addresses?.map((address) => (
+                            <LocationPanel.AddressCard
+                              key={address.id}
+                              className={cn(
+                                "cursor-pointer",
+                                address.id === locationValue.id &&
+                                  "ring-2 ring-primary",
+                              )}
+                              onClick={() =>
+                                setLocationValue({
+                                  id: address.id,
+                                  city: address.address.city,
+                                  state: address.address.state,
+                                })
+                              }
+                            >
+                              <House className="size-6" />
+                              <LocationPanel.CardContent>
+                                <LocationPanel.CardType>
+                                  {address.type}
+                                </LocationPanel.CardType>
+                                <LocationPanel.CardStreetNumber>
+                                  <span>
+                                    {address.address.street},{" "}
+                                    {address.address.state}
+                                  </span>
+                                </LocationPanel.CardStreetNumber>
+                              </LocationPanel.CardContent>
+                            </LocationPanel.AddressCard>
+                          ))}
+                        </LocationPanel.Content>
+                      </div>
+                    </LocationPanel.Root>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
+
+          <FormField
+            control={form.control}
+            name="workType"
+            render={({ field }) => (
+              <FormItem className="col-span-4 sm:col-span-2">
+                <FormLabel htmlFor="workType">Tipo de Trabalho</FormLabel>
+                <FormControl>
+                  <Select
+                    {...field}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selectione o tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="REMOTE">Remoto</SelectItem>
+                        <SelectItem value="ONSITE">Presencial</SelectItem>
+                        <SelectItem value="HYBRID">Híbrido</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="deadline"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel>Prazo para inscrições (max. 7 dias)</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[240px] pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground",
+                        )}
+                      >
+                        {field.value ? (
+                          // Exibe a data formatada, convertendo de string ISO para Date
+                          format(new Date(field.value), "PPP", { locale: pt })
+                        ) : (
+                          <span>Escolha uma data</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      locale={pt}
+                      // Converte a string ISO de volta para Date para a seleção do calendário
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          // Converte a data para ISO string ao selecionar
+                          field.onChange(date.toISOString());
+                        }
+                      }}
+                      // Desabilita datas fora do intervalo permitido
+                      disabled={(date) =>
+                        date < new Date() ||
+                        date >
+                          new Date(new Date().setDate(new Date().getDate() + 7))
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <Button onClick={handlePrevious} variant="outline" type="button">
+            Voltar
+          </Button>
+
+          <Button type="submit">Próximo</Button>
+        </div>
       </form>
     </Form>
   );

@@ -1,6 +1,5 @@
 import { Category } from "@/types/category";
-import { ServiceRequest } from "@/types/service/service-request";
-import { Location } from "@/types/service/service-request";
+import { Location, ServiceRequest } from "@/types/service/service-request";
 import { create } from "zustand";
 
 interface ServiceState {
@@ -13,7 +12,10 @@ interface ServiceState {
 
   createService: () => Promise<void>;
   deleteService: (id: string) => Promise<void>;
-  editService: (id: string, service: Omit<ServiceRequest, "id">) => Promise<void>;
+  editService: (
+    id: string,
+    service: Omit<ServiceRequest, "id">,
+  ) => Promise<void>;
   selectAllServices: () => Promise<void>;
   selectServiceById: (id: string) => ServiceRequest;
 
@@ -25,8 +27,8 @@ interface ServiceState {
   setMaximunPrice: (maximum: string) => void;
   setDescription: (description: string) => void;
   setLocation: (location: Location) => void;
-  setWorkType: (workType: "REMOTE" | "ONSIDE" | "HYBRID") => void;
-  setApplicationDeadline: (aplicationDeadline: string) => void;
+  setWorkType: (workType: "REMOTE" | "ONSITE" | "HYBRID") => void;
+  setDeadline: (deadline: string) => void;
 
   handleValidationToNextStep: () => boolean;
 
@@ -54,7 +56,7 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
     },
     workType: "REMOTE",
     categories: [],
-    applicationDeadline: "",
+    deadline: "",
   },
 
   categoriesSelected: [],
@@ -167,11 +169,11 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
       },
     })),
 
-  setApplicationDeadline: (applicationDeadline) =>
+  setDeadline: (deadline) =>
     set((state) => ({
       service: {
         ...state.service,
-        applicationDeadline,
+        deadline,
       },
     })),
 

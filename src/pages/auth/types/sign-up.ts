@@ -1,23 +1,10 @@
+import { transformDateToISO, verifyLeepYear } from "@/utils/date";
 import { cpf } from "cpf-cnpj-validator";
 import dayjs from "dayjs";
 import isLeapYear from "dayjs/plugin/isLeapYear";
 import { z } from "zod";
 
 dayjs.extend(isLeapYear);
-
-function transformDateToISO(value: string) {
-  const [day, month, year] = value.split("/");
-  return `${year}-${month}-${day}`;
-}
-
-function verifyLeepYear(value: string) {
-  if (value.includes("02-29")) {
-    if (dayjs(value).isLeapYear()) return true;
-    else return false;
-  }
-
-  return true;
-}
 
 function isAtLeast18YearsOld(date: string) {
   return dayjs().diff(dayjs(date), "year") >= 18;

@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Form,
   FormControl,
   FormItem,
   FormLabel,
@@ -22,7 +23,7 @@ import { SignInSchema, signInValidation } from "./types/sign-in";
 import GoogleImage from "/google-icon.png";
 
 export function SignIn() {
-  const { handleSubmit, control, formState } = useForm<SignInSchema>({
+  const form = useForm<SignInSchema>({
     resolver: zodResolver(signInValidation),
   });
 
@@ -44,43 +45,48 @@ export function SignIn() {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-6">
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field }) => (
-              <FormItem className="space-y-1">
-                <FormLabel htmlFor="email">Email</FormLabel>
-                <FormControl>
-                  <Input {...field} id="email" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Form {...form}>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <Controller
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel htmlFor="email">Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} id="email" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Controller
-            control={control}
-            name="password"
-            render={({ field }) => (
-              <FormItem className="space-y-1">
-                <FormLabel htmlFor="password">Password</FormLabel>
-                <FormControl>
-                  <Input {...field} id="password" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <Controller
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} id="password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Link to="/auth/esqueceu-senha" className="block text-end text-sm">
-            Esqueceu a senha?
-          </Link>
+            <Link to="/auth/esqueceu-senha" className="block text-end text-sm">
+              Esqueceu a senha?
+            </Link>
 
-          <Button disabled={formState.isSubmitting} className="w-full py-6">
-            Entrar
-          </Button>
-        </form>
+            <Button disabled={form.formState.isSubmitting} className="w-full py-6">
+              Entrar
+            </Button>
+          </form>
+        </Form>
       </CardContent>
 
       <CardFooter>
