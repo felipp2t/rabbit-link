@@ -1,7 +1,7 @@
-import { ServiceResponse } from "@/@types/service/service-response";
+import { ServiceResponse } from '@/@types/service/service-response';
 
 interface getServiceByIdProps {
-  id: string
+  id: string;
 }
 
 export async function getServiceById({ id }: getServiceByIdProps) {
