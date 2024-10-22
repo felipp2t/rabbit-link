@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -6,84 +6,103 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
+  FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { handleSignIn } from "@/http/auth/sign-in-user";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
-import { SignInSchema, signInValidation } from "./types/sign-in";
-import GoogleImage from "/google-icon.png";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { handleSignIn } from '@/http/auth/sign-in';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+import { SignInSchema, signInValidation } from './types/sign-in';
+import GoogleImage from '/google-icon.png';
 
 export function SignIn() {
   const form = useForm<SignInSchema>({
     resolver: zodResolver(signInValidation),
   });
 
+  const { mutateAsync: signInMutation } = useMutation({
+    mutationKey: ['sign-in'],
+    mutationFn: async (data: SignInSchema) => await handleSignIn(data),
+  });
+
   async function onSubmit(data: SignInSchema) {
-    handleSignIn({
-      email: data.email,
-      password: data.password,
-    });
+    try {
+      await signInMutation(data);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl font-semibold tracking-tight">
+        <CardTitle className='text-2xl font-semibold tracking-tight'>
           Faça Login
         </CardTitle>
-        <CardDescription className="text-sm text-muted-foreground">
+        <CardDescription className='text-sm text-muted-foreground'>
           Faça login para acessar sua conta e gerenciar seus serviços.
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-6">
+      <CardContent className='px-6'>
         <Form {...form}>
           <form
-            className="flex flex-col gap-4"
+            className='flex flex-col gap-4'
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <Controller
+            <FormField
               control={form.control}
-              name="email"
+              name='email'
               render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel htmlFor="email">Email</FormLabel>
+                <FormItem className='space-y-1'>
+                  <FormLabel htmlFor='email'>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} id="email" />
+                    <Input {...field} id='email' value={field.value} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Controller
+            <FormField
               control={form.control}
-              name="password"
+              name='password'
               render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel htmlFor="password">Password</FormLabel>
+                <FormItem className='space-y-1'>
+                  <FormLabel htmlFor='password'>Password</FormLabel>
                   <FormControl>
-                    <Input {...field} id="password" />
+                    <Input {...field} id='password' value={field.value} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Link to="/auth/esqueceu-senha" className="block text-end text-sm">
+            <Link to='/auth/esqueceu-senha' className='block text-end text-sm'>
               Esqueceu a senha?
             </Link>
 
-            <Button disabled={form.formState.isSubmitting} className="w-full py-6">
-              Entrar
+            <Button
+              disabled={form.formState.isSubmitting}
+              className='w-full py-6'
+            >
+              {form.formState.isSubmitting ? (
+                <div className='flex'>
+                  <Loader2 className='animate-spin mr-2' />
+                  <p>Entrando</p>
+                </div>
+              ) : (
+                <p>Entrar</p>
+              )}
             </Button>
           </form>
         </Form>
@@ -92,15 +111,11 @@ export function SignIn() {
       <CardFooter>
         <Button
           asChild
-          variant="outline"
-          className="flex w-full items-center gap-4 px-4 py-6"
+          variant='outline'
+          className='flex w-full items-center gap-4 px-4 py-6'
         >
-          <Link
-            to={
-              import.meta.env.VITE_BACK_API_URL + "/oauth2/authorization/google"
-            }
-          >
-            <img src={GoogleImage} alt="google-image" />
+          <Link to={'http://localhost:80/api/oauth2/authorization/google'}>
+            <img src={GoogleImage} alt='google-image' />
             Entrar com o google
           </Link>
         </Button>

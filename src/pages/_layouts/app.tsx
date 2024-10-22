@@ -1,12 +1,14 @@
-import { Header } from "@/components/header";
-import { BlockInTheSMScreen } from "@/components/hidden-and-block/block-sm-screen";
-import { BlockInTheXLScreen } from "@/components/hidden-and-block/block-xl-screen";
-import { HiddenInTheSMScreen } from "@/components/hidden-and-block/hidden-sm-screen";
-import { LocationPanel } from "@/components/location-manager";
-import { LocationManagerModal } from "@/components/location-manager-modal";
-import { Sidebar } from "@/components/sidebar";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { Button } from "@/components/ui/button";
+import { AddressRequest } from '@/@types/address/address-request';
+import { AddressResponse } from '@/@types/address/address-response';
+import { Header } from '@/components/header';
+import { BlockInTheSMScreen } from '@/components/hidden-and-block/block-sm-screen';
+import { BlockInTheXLScreen } from '@/components/hidden-and-block/block-xl-screen';
+import { HiddenInTheSMScreen } from '@/components/hidden-and-block/hidden-sm-screen';
+import { LocationPanel } from '@/components/location-manager';
+import { LocationManagerModal } from '@/components/location-manager-modal';
+import { Sidebar } from '@/components/sidebar';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,31 +16,47 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useUserStore } from "@/context/use-user-store";
-import { getAddresses } from "@/http/address/get-addresses";
-import { getUser } from "@/http/user/get-user";
-import { AddressRequest } from "@/types/address/address-request";
-import { AddressResponse } from "@/types/address/address-response";
-import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, Rabbit } from "lucide-react";
-import { useEffect } from "react";
-import { Link, Outlet } from "react-router-dom";
-import ProfilePicture from "/imagem-perfil.jpg";
+} from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
+import { getAddresses } from '@/http/address/get-addresses';
+import { getUser } from '@/http/user/get-user';
+import { useUserStore } from '@/stores/use-user-store';
+import { useQuery } from '@tanstack/react-query';
+import { ChevronDown, LogIn, Rabbit } from 'lucide-react';
+import { useEffect } from 'react';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
+import ProfilePicture from '/imagem-perfil.jpg';
 
 export function AppLayout() {
-  const { setUser, setAddresses, user } = useUserStore();
+  const navigate = useNavigate();
+  const { setUser, setAddresses, resetUser, user } = useUserStore();
 
-  const token = localStorage.getItem("token");
+  const { toast } = useToast();
 
-  const { data: userFound, isLoading: isLoaginGetUser } = useQuery({
-    queryKey: ["user", token],
-    queryFn: async () => {
-      if (token) {
-        return await getUser({ token });
-      }
-    },
-    staleTime: 1000 * 60 * 15, // 15 minutes
+  useEffect(() => {
+    if (user?.addresses?.length === 0) {
+      toast({
+        title: 'Importante!',
+        description:
+          'Adicione um endereço para ver os serviços disponíveis na sua região.',
+        variant: 'destructive',
+        duration: 1000 * 7,
+      });
+    }
+  }, [user, toast]);
+
+  const token = localStorage.getItem('token');
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    resetUser();
+    navigate('/auth');
+  };
+
+  const { data: userFound, isLoading: isLoadinGetUser } = useQuery({
+    queryKey: ['get-user-by-token', token],
+    queryFn: async () => await getUser(),
+    staleTime: 1000 * 60 * 15,
     enabled: !!token,
   });
 
@@ -49,99 +67,109 @@ export function AppLayout() {
   }, [userFound, user, setUser]);
 
   const { data: addressesFound, isLoading: isLoadingGetAddresses } = useQuery({
-    queryKey: ["get-addresses", token],
-    queryFn: async () => {
-      if (token) {
-        return await getAddresses();
-      }
-    },
-    enabled: !!token,
+    queryKey: ['get-addresses-by-token', token],
+    queryFn: async () => await getAddresses(),
     staleTime: 1000 * 60 * 15,
+    enabled: !!token,
   });
 
   useEffect(() => {
-    if (addressesFound) {
+    if (addressesFound && addressesFound.length > 0) {
       const addresses = mapAddresses(addressesFound);
 
       setAddresses(addresses);
     }
   }, [addressesFound, setAddresses]);
 
-  if (isLoaginGetUser || isLoadingGetAddresses) {
+  if (isLoadinGetUser || isLoadingGetAddresses) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className='flex min-h-screen items-center justify-center'>
         <p>Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background antialiased">
-      <BlockInTheXLScreen className="fixed left-0 top-0 h-full w-64">
+    <div className='flex min-h-screen flex-col bg-background antialiased'>
+      <BlockInTheXLScreen className='fixed left-0 top-0 h-full w-64'>
         <Sidebar />
       </BlockInTheXLScreen>
 
-      <div className="xl:ml-64">
-        <Header.Root className="flex items-center justify-between">
+      <div className='xl:ml-64'>
+        <Header.Root className='flex items-center justify-between'>
           <Header.Group>
             <Header.SidebarIcon />
             <BlockInTheXLScreen>
               <Header.Logo>
-                <Rabbit className="size-8 text-muted" />
+                <Rabbit className='size-8 text-muted' />
               </Header.Logo>
             </BlockInTheXLScreen>
           </Header.Group>
 
-          <BlockInTheSMScreen className="w-1/3">
-            <Header.SearchInput className="w-full" />
+          <BlockInTheSMScreen className='w-1/3'>
+            <Header.SearchInput className='w-full' />
           </BlockInTheSMScreen>
-          <Header.Group className="md:gap-8">
-            <LocationPanel.Root>
-              <LocationPanel.Trigger>
-                <div className="hover: flex cursor-pointer items-center gap-2 text-secondary-foreground">
-                  <p className="text-xs md:text-sm">
-                    R. Argemiro Frutuoso, 402
-                  </p>
-                  <ChevronDown className="size-4" />
-                </div>
-              </LocationPanel.Trigger>
-              <LocationManagerModal />
-            </LocationPanel.Root>
+          <Header.Group className='md:gap-4'>
+            {user && (
+              <LocationPanel.Root>
+                <LocationPanel.Trigger>
+                  <Button variant='outline' className='space-x-2'>
+                    <p className='text-xs md:text-sm'>Seus Endereços</p>
+                    <ChevronDown className='size-5' />
+                  </Button>
+                </LocationPanel.Trigger>
+                <LocationManagerModal />
+              </LocationPanel.Root>
+            )}
             <ThemeToggle />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="overflow-hidden rounded-full"
-                >
-                  <img
-                    src={ProfilePicture}
-                    alt="Avatar"
-                    className="size-9 overflow-hidden rounded-full"
-                  />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel className="">Olá, Felipe</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer">
-                  <Link to="/editar-perfil">Configurações</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer">
-                  Sair
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {!token ? (
+              <Button
+                variant='outline'
+                className='aspect-square p-0'
+                onClick={() => navigate('/auth')}
+              >
+                <LogIn className='size-5' />
+              </Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant='outline'
+                    size='icon'
+                    className='overflow-hidden rounded-full'
+                  >
+                    <img
+                      src={ProfilePicture}
+                      alt='Avatar'
+                      className='size-9 overflow-hidden rounded-full'
+                    />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuLabel className=''>
+                    Olá, Felipe
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className='cursor-pointer'>
+                    <Link to='/editar-perfil'>Configurações</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className='cursor-pointer' onClick={logout}>
+                    Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </Header.Group>
         </Header.Root>
 
         <HiddenInTheSMScreen>
-          <Header.SearchInput className="mx-auto my-4 w-96" />
+          <div className='px-8'>
+            <Header.SearchInput className='mx-auto my-4 w-full' />
+          </div>
         </HiddenInTheSMScreen>
 
-        <div className="flex flex-1 flex-col gap-4">
+        <div className='mt-4 xl:mt-16'>
           <Outlet />
         </div>
       </div>
@@ -163,11 +191,9 @@ const mapAddresses = (addresses: AddressResponse[]): AddressRequest[] => {
         number: address.houseNumber,
       },
       apartmentNumber: address.apartmentNumber,
-      apartamentName: address.apartmentName,
+      apartmentName: address.apartmentName,
     }),
   );
 
-  console.log(addresses)
-
   return addressesMapped;
-}
+};

@@ -1,6 +1,6 @@
-import { Category } from "@/types/category";
-import { Location, ServiceRequest } from "@/types/service/service-request";
-import { create } from "zustand";
+import { Category } from '@/@types/category';
+import { Location, ServiceRequest } from '@/@types/service/service-request';
+import { create } from 'zustand';
 
 interface ServiceState {
   service: ServiceRequest;
@@ -11,13 +11,8 @@ interface ServiceState {
   setStep: (step: number) => void;
 
   createService: () => Promise<void>;
-  deleteService: (id: string) => Promise<void>;
-  editService: (
-    id: string,
-    service: Omit<ServiceRequest, "id">,
-  ) => Promise<void>;
+
   selectAllServices: () => Promise<void>;
-  selectServiceById: (id: string) => ServiceRequest;
 
   handleNext: () => void;
   handlePrevious: () => void;
@@ -27,7 +22,7 @@ interface ServiceState {
   setMaximunPrice: (maximum: string) => void;
   setDescription: (description: string) => void;
   setLocation: (location: Location) => void;
-  setWorkType: (workType: "REMOTE" | "ONSITE" | "HYBRID") => void;
+  setWorkType: (workType: 'REMOTE' | 'ONSITE') => void;
   setDeadline: (deadline: string) => void;
 
   handleValidationToNextStep: () => boolean;
@@ -42,37 +37,33 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
   error: null,
 
   service: {
-    id: "",
-    title: "",
-    description: "",
+    id: '',
+    title: '',
+    description: '',
     price: {
-      minimum: "",
-      maximum: "",
+      minimum: '',
+      maximum: '',
     },
     location: {
-      id: "",
-      city: "",
-      state: "",
+      id: '',
+      city: '',
+      state: '',
     },
-    workType: "REMOTE",
+    workType: 'REMOTE',
     categories: [],
-    deadline: "",
+    deadline: '',
   },
 
   categoriesSelected: [],
 
   createService: async () => {},
 
-  deleteService: async (id: string) => {},
-
-  editService: async (id: string, service: Omit<ServiceRequest, "id">) => {},
-
   selectAllServices: async () => {},
 
-  addCategory: (category) =>
-    set((state) => {
+  addCategory: category =>
+    set(state => {
       const categoryIdAlreadyExists = state.service.categories.find(
-        (c) => c.id === category.id,
+        c => c.id === category.id,
       );
 
       if (categoryIdAlreadyExists) {
@@ -80,7 +71,7 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
           service: {
             ...state.service,
             categories: state.service.categories.filter(
-              (c) => c.id !== category.id,
+              c => c.id !== category.id,
             ),
           },
         };
@@ -98,33 +89,28 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
       return state;
     }),
 
-  selectServiceById: (id: string) => {
-    const state = get();
-    return state.service;
-  },
-
   handleNext: () => {
-    set((state) => ({
+    set(state => ({
       step: state.step + 1,
     }));
   },
 
   handlePrevious: () => {
-    set((state) => ({
+    set(state => ({
       step: state.step - 1,
     }));
   },
 
-  setTitle: (title) =>
-    set((state) => ({
+  setTitle: title =>
+    set(state => ({
       service: {
         ...state.service,
         title,
       },
     })),
 
-  setMaximunPrice: (maximum) =>
-    set((state) => ({
+  setMaximunPrice: maximum =>
+    set(state => ({
       service: {
         ...state.service,
         price: {
@@ -134,8 +120,8 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
       },
     })),
 
-  setMinimumPrice: (minimum) =>
-    set((state) => ({
+  setMinimumPrice: minimum =>
+    set(state => ({
       service: {
         ...state.service,
         price: {
@@ -145,32 +131,32 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
       },
     })),
 
-  setDescription: (description) =>
-    set((state) => ({
+  setDescription: description =>
+    set(state => ({
       service: {
         ...state.service,
         description,
       },
     })),
 
-  setLocation: (location) =>
-    set((state) => ({
+  setLocation: location =>
+    set(state => ({
       service: {
         ...state.service,
         location,
       },
     })),
 
-  setWorkType: (workType) =>
-    set((state) => ({
+  setWorkType: workType =>
+    set(state => ({
       service: {
         ...state.service,
         workType,
       },
     })),
 
-  setDeadline: (deadline) =>
-    set((state) => ({
+  setDeadline: deadline =>
+    set(state => ({
       service: {
         ...state.service,
         deadline,
@@ -195,14 +181,12 @@ export const useServiceStore = create<ServiceState>()((set, get) => ({
   },
 
   formatBrazilNumber: (price: string) => {
-    let formattedPrice = price.replace(/\./g, "");
+    let formattedPrice = price.replace(/\./g, '');
 
-    formattedPrice = formattedPrice.replace(",", ".");
+    formattedPrice = formattedPrice.replace(',', '.');
 
-    console.log(parseFloat(formattedPrice));
-
-    return parseFloat(formattedPrice);
+    return Number.parseFloat(formattedPrice);
   },
 
-  setStep: (step) => set({ step }),
+  setStep: step => set({ step }),
 }));

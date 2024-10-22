@@ -27,7 +27,7 @@ export function AlertDialogToDeleteAddress({
           Você tem certeza que deseja excluir este endereço? Esta ação não pode
           ser desfeita.
         </AlertDialogDescription>
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-4">
           <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>
             Cancelar
           </AlertDialogCancel>

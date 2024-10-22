@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const serviceDetailsSchema = z
+export const editServiceSchema = z
   .object({
     title: z
       .string({ required_error: 'Obrigatório' })
@@ -36,7 +36,12 @@ export const serviceDetailsSchema = z
     workType: z.enum(['REMOTE', 'ONSITE'], {
       required_error: 'Tipo de trabalho é obrigatório',
     }),
-    deadline: z.string(),
+    categories: z.array(
+      z.object({
+        id: z.string(),
+      }),
+      { required_error: 'Selecione ao menos uma categoria' },
+    ),
   })
   .refine(
     fields => {
@@ -48,19 +53,6 @@ export const serviceDetailsSchema = z
       message: 'O preço mínimo deve ser menor que o preço máximo',
       path: ['price', 'minimum'],
     },
-  )
-  .refine(
-    fields => {
-      const today = new Date();
-      const maxDeadline = new Date(today);
-      maxDeadline.setDate(today.getDate() + 7);
-      return fields.deadline <= maxDeadline.toISOString();
-    },
-    {
-      message:
-        'O prazo para inscrições não pode ser superior a 7 dias a partir de hoje',
-      path: ['deadline'],
-    },
   );
 
-export type ServiceDetailsSchema = z.infer<typeof serviceDetailsSchema>;
+export type EditServiceSchema = z.infer<typeof editServiceSchema>;

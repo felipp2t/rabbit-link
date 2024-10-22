@@ -1,11 +1,5 @@
-import {
-  CalendarPlus,
-  Home,
-  Layers,
-  MessageCircleIcon,
-  Search,
-} from "lucide-react";
-import { Navigation } from "./navigation";
+import { CalendarPlus, Home, Layers, MessageCircleIcon } from 'lucide-react';
+import { Navigation } from './navigation';
 
 export function Sidebar() {
   return (
@@ -19,28 +13,23 @@ export function Sidebar() {
             <Navigation.NavHeaderTitle>Navegação</Navigation.NavHeaderTitle>
           </Navigation.NavHeader>
           <Navigation.NavMain>
-            <Navigation.NavLink to="/">
-              <Home className="size-4" />
+            <Navigation.NavLink to='/'>
+              <Home className='size-4' />
               <Navigation.NavLinkTitle>Início</Navigation.NavLinkTitle>
             </Navigation.NavLink>
 
-            <Navigation.NavLink to="/procurar">
-              <Search className="size-4" />
-              <Navigation.NavLinkTitle>Procurar</Navigation.NavLinkTitle>
-            </Navigation.NavLink>
-
-            <Navigation.NavLink to="/meus-servicos">
-              <Layers className="size-4" />
+            <Navigation.NavLink to='/meus-servicos'>
+              <Layers className='size-4' />
               <Navigation.NavLinkTitle>Serviços</Navigation.NavLinkTitle>
             </Navigation.NavLink>
 
-            <Navigation.NavLink to="/criar-servico">
-              <CalendarPlus className="size-4" />
+            <Navigation.NavLink to='/criar-servico'>
+              <CalendarPlus className='size-4' />
               <Navigation.NavLinkTitle>Criar serviço</Navigation.NavLinkTitle>
             </Navigation.NavLink>
 
-            <Navigation.NavLink to="/conversas">
-              <MessageCircleIcon className="size-4" />
+            <Navigation.NavLink to='/conversas'>
+              <MessageCircleIcon className='size-4' />
               <Navigation.NavLinkTitle>Conversas</Navigation.NavLinkTitle>
             </Navigation.NavLink>
           </Navigation.NavMain>

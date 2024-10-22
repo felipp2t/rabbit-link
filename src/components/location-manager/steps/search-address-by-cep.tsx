@@ -1,11 +1,11 @@
-import { CepSchema } from "@/types/cep";
+import { CepSchema } from "@/@types/cep";
 
+import { cepValidation } from "@/@types/cep";
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { cepValidation } from "@/types/cep";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
