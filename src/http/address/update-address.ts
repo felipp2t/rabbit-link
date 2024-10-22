@@ -1,4 +1,4 @@
-import { AddressSchema } from "@/types/address/address-schema";
+import { AddressSchema } from "@/@types/address/address-schema";
 
 interface updateAddressProps {
   address: AddressSchema;

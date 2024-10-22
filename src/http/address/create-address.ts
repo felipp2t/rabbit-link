@@ -1,17 +1,21 @@
-import { AddressRequest } from "@/types/address/address-request";
+import { AddressRequest } from '@/@types/address/address-request';
 
-export async function createAddress(address: Omit<AddressRequest, "id">) {
-
-  const token = localStorage.getItem("token");
+export async function createAddress(address: Omit<AddressRequest, 'id'>) {
+  const token = localStorage.getItem('token');
 
   if (!token) {
-    throw new Error("Token not found");
+    throw new Error('Token not found');
   }
 
-  await fetch("http://localhost:80/api/address", {
-    method: "POST",
+  console.log(address.address);
+  console.log(address.type);
+  console.log(address.apartmentName);
+  console.log(address.apartmentNumber);
+
+  await fetch('http://localhost:80/api/address', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({

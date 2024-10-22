@@ -1,4 +1,4 @@
-import { ServiceRequest } from "@/types/service/service-request";
+import { ServiceRequest } from "@/@types/service/service-request";
 
 interface createServiceRequest {
   service: ServiceRequest;

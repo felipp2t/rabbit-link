@@ -4,16 +4,20 @@ interface ConfirmOTPRequest {
 }
 
 export async function handleConfirmOTP(data: ConfirmOTPRequest) {
-  await fetch(import.meta.env.VITE_BACKEND_URL + "/api/confirm-otp", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "ngrok-skip-browser-warning": "true",
-    },
-    body: JSON.stringify({
-      otp: data.otp,
-    }),
-  });
+  try {
+    await fetch("http://localhost:80/confirm-otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+      body: JSON.stringify({
+        otp: data.otp,
+      }),
+    });
 
-  location.href = `/auth/reset-password?email=${data.email}`;
+    location.href = `/auth/reset-password?email=${data.email}`;
+  } catch (error) {
+    console.error(error);
+  }
 }

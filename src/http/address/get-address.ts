@@ -1,4 +1,4 @@
-import { AddressResponse } from "@/types/address/address-response";
+import { AddressResponse } from "@/@types/address/address-response";
 
 interface getAddressProps {
   id: string;

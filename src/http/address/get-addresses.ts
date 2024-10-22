@@ -1,4 +1,4 @@
-import { AddressResponse } from "@/types/address/address-response";
+import { AddressResponse } from "@/@types/address/address-response";
 
 export async function getAddresses() {
   try {

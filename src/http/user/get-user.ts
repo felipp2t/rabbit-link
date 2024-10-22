@@ -1,22 +1,19 @@
-import { User } from "@/types/user";
+import { User } from "@/@types/user";
 
-interface getUserRequest {
-  token: string;
-}
-
-export async function getUser(data: getUserRequest) {
-  const response = await fetch(
-    `https://a34e-201-76-2-12.ngrok-free.app/api/user/me`,
-    {
+export async function getUser() {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`http://localhost:80/api/users/me`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true",
-        Authorization: "Bearer " + data.token,
+        Authorization: `Bearer ${token}`,
       },
-    },
-  );
+    });
 
-  const user: User = await response.json();
-  return user;
+    const user: User = await response.json();
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
 }
