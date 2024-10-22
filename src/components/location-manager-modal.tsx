@@ -1,22 +1,22 @@
-import { LocationPanel } from "@/components/location-manager";
-import { useUserStore } from "@/context/use-user-store";
-import { Replace } from "@/helpers/replace";
-import { deleteAddress } from "@/http/address/delete-address";
-import { cn } from "@/lib/utils";
-import { AddressRequest } from "@/types/address/address-request";
-import { CepSchema } from "@/types/cep";
-import { handleAddressSearch } from "@/utils/address";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, EllipsisVertical, House, Pen, Trash } from "lucide-react";
-import { useState } from "react";
-import { Button } from "./ui/button";
+import { AddressRequest } from '@/@types/address/address-request';
+import { CepSchema } from '@/@types/cep';
+import { LocationPanel } from '@/components/location-manager';
+import { Replace } from '@/helpers/replace';
+import { deleteAddress } from '@/http/address/delete-address';
+import { cn } from '@/lib/utils';
+import { useUserStore } from '@/stores/use-user-store';
+import { handleAddressSearch } from '@/utils/address';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ChevronLeft, EllipsisVertical, House, Pen, Trash } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from './ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from './ui/dropdown-menu';
 
 export function LocationManagerModal() {
   const [step, setStep] = useState(1);
@@ -25,18 +25,18 @@ export function LocationManagerModal() {
     null,
   );
   const [addressDetails, setAddressDetails] = useState<
-    Replace<AddressRequest, { id?: string; type?: "HOUSE" | "APARTMENT" }>
+    Replace<AddressRequest, { id?: string; type?: 'HOUSE' | 'APARTMENT' }>
   >({
-    apartmentName: "",
+    apartmentName: '',
     apartmentNumber: 0,
-    id: "",
+    id: '',
     address: {
-      cep: "",
-      city: "",
-      neighborhood: "",
+      cep: '',
+      city: '',
+      neighborhood: '',
       number: 0,
-      state: "",
-      street: "",
+      state: '',
+      street: '',
     },
   });
 
@@ -50,7 +50,7 @@ export function LocationManagerModal() {
 
   const searchUserAddress = (addressId: string) => {
     const foundAddress = user.addresses.find(
-      (address) => address.id === addressId,
+      address => address.id === addressId,
     );
 
     if (!foundAddress) {
@@ -59,7 +59,7 @@ export function LocationManagerModal() {
 
     setAddressDetails({
       id: foundAddress.id,
-      type: foundAddress.type,
+      type: 'HOUSE',
       address: {
         cep: foundAddress.address.cep,
         city: foundAddress.address.city,
@@ -71,17 +71,18 @@ export function LocationManagerModal() {
       apartmentName: foundAddress.apartmentName,
       apartmentNumber: foundAddress.apartmentNumber,
     });
+   
     setStep(3);
   };
 
   const queryClient = useQueryClient();
 
   const { mutateAsync: deleteAddressMutation } = useMutation({
-    mutationKey: ["delete-address", addressIdToDelete],
+    mutationKey: ['delete-address', addressIdToDelete],
     mutationFn: async ({ addressIdToDelete }: { addressIdToDelete: string }) =>
       await deleteAddress(addressIdToDelete),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["get-addresses"] });
+      queryClient.invalidateQueries({ queryKey: ['get-addresses'] });
     },
   });
 
@@ -120,15 +121,15 @@ export function LocationManagerModal() {
 
       <LocationPanel.Header show={step === 2}>
         <LocationPanel.Title>
-          <div className="flex items-center gap-4">
+          <div className='flex items-center gap-4'>
             <ChevronLeft
-              className="size-6 cursor-pointer text-primary"
-              onClick={() => setStep((prev) => prev - 1)}
+              className='size-6 cursor-pointer text-primary'
+              onClick={() => setStep(prev => prev - 1)}
             />
             <h2>Adicionar endereço</h2>
           </div>
         </LocationPanel.Title>
-        <LocationPanel.Description className="ml-10">
+        <LocationPanel.Description className='ml-10'>
           Nesta etapa, você poderá inserir um novo endereço. Certifique-se de
           que a informação esteja correta
         </LocationPanel.Description>
@@ -136,19 +137,14 @@ export function LocationManagerModal() {
 
       <LocationPanel.Header show={!addressDetails.id && step === 3}>
         <LocationPanel.Title>
-          <div className="flex items-center gap-4">
+          <div className='flex items-center gap-4'>
             <ChevronLeft
-              className="size-6 cursor-pointer text-primary"
-              onClick={() => setStep((prev) => prev - 1)}
+              className='size-6 cursor-pointer text-primary'
+              onClick={() => setStep(prev => prev - 1)}
             />
             <h2>Confirme o endereço</h2>
           </div>
         </LocationPanel.Title>
-        <LocationPanel.Description className="ml-10">
-          Verifique as informações do endereço que você acabou de adicionar. É
-          importante garantir que tudo esteja correto antes de finalizar o
-          processo.
-        </LocationPanel.Description>
       </LocationPanel.Header>
 
       <LocationPanel.Header show={!!addressDetails.id && step === 3}>
@@ -163,48 +159,51 @@ export function LocationManagerModal() {
 
       <LocationPanel.SelectAddress show={verifyHasAnyAddress() && step === 1}>
         {user?.addresses?.length > 0 &&
-          user.addresses.map((address) => (
+          user.addresses.map(address => (
             <LocationPanel.AddressCard key={address.id}>
-              <House className="size-6" />
+              <House className='size-6' />
               <LocationPanel.CardContent>
                 <LocationPanel.CardType>
-                  {address.type === "APARTMENT" ? (
-                    <span className="capitalize">
+                  {address.type === 'APARTMENT' ? (
+                    <span className='capitalize'>
                       {address.type}, ap. {address.apartmentNumber}
                     </span>
                   ) : (
-                    <span className="capitalize">{address.type}</span>
+                    <span className='capitalize'>{address.type}</span>
                   )}
                 </LocationPanel.CardType>
                 <LocationPanel.CardStreetNumber>
-                  <p className="line-clamp-2 text-sm">
-                    {address.address.street}, {address.address.number},{" "}
+                  <p className='line-clamp-2 text-sm'>
+                    {address.address.street}, {address.address.number},{' '}
                     {address.address.city} - {address.address.state}
                   </p>
                 </LocationPanel.CardStreetNumber>
               </LocationPanel.CardContent>
-              <Button className="group grid size-8 place-content-center self-start bg-transparent p-0 hover:bg-transparent">
+              <Button
+               className='group grid size-8 place-content-center self-start bg-transparent p-0 hover:bg-transparent'
+               onClick={(e) => e.preventDefault()}
+               >
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <EllipsisVertical className="size-6 self-start border-none text-secondary-foreground hover:text-primary" />
+                    <EllipsisVertical className='size-6 self-start border-none text-secondary-foreground hover:text-primary' />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
-                      className="cursor-pointer"
+                      className='cursor-pointer'
                       onClick={() => searchUserAddress(address.id)}
                     >
-                      <Pen className="mr-2 size-4" />
+                      <Pen className='mr-2 size-4' />
                       <p>Editar</p>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="cursor-pointer"
+                      className='cursor-pointer'
                       onClick={() => {
                         setAddressIdToDelete(address.id);
                         setIsDialogOpen(true);
                       }}
                     >
-                      <Trash className="mr-2 size-4" />
+                      <Trash className='mr-2 size-4' />
                       <p>Excluir</p>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -224,9 +223,9 @@ export function LocationManagerModal() {
             Cancelar
           </LocationPanel.CancelButton>
           <Button
-            className="semibold"
+            className='semibold'
             disabled={user?.addresses?.length >= 3}
-            onClick={() => setStep((prev) => prev + 1)}
+            onClick={() => setStep(prev => prev + 1)}
           >
             Adicione um novo endereço
           </Button>
@@ -247,17 +246,14 @@ export function LocationManagerModal() {
 
       <LocationPanel.Footer
         className={cn(
-          "hidden",
-          !verifyHasAnyAddress() && step === 1 && "block",
+          'hidden',
+          !verifyHasAnyAddress() && step === 1 && 'block',
         )}
       >
         <LocationPanel.CancelButton onClick={() => setStep(1)}>
           Cancelar
         </LocationPanel.CancelButton>
-        <Button
-          className="semibold"
-          onClick={() => setStep((prev) => prev + 1)}
-        >
+        <Button className='semibold' onClick={() => setStep(prev => prev + 1)}>
           Adicione um endereço
         </Button>
       </LocationPanel.Footer>
