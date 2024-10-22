@@ -1,15 +1,15 @@
-import { Replace } from "@/helpers/replace";
-import { AddressRequest } from "@/types/address/address-request";
-import { CepSchema } from "@/types/cep";
-import { Dispatch } from "react";
-import { searchAddressByCEP } from "./search-address-by-cep";
-import { transformStreetAddress } from "./transform-street-address";
+import { AddressRequest } from '@/@types/address/address-request';
+import { CepSchema } from '@/@types/cep';
+import { Replace } from '@/helpers/replace';
+import { Dispatch } from 'react';
+import { searchAddressByCEP } from './search-address-by-cep';
+import { transformStreetAddress } from './transform-street-address';
 
 interface handleAddressSearchProps {
   data: CepSchema;
   setAddressDetails: Dispatch<
     React.SetStateAction<
-      Replace<AddressRequest, { id?: string; type?: "HOUSE" | "APARTMENT" }>
+      Replace<AddressRequest, { id?: string; type?: 'HOUSE' | 'APARTMENT' }>
     >
   >;
   setStep: Dispatch<React.SetStateAction<number>>;
@@ -31,6 +31,7 @@ export async function handleAddressSearch({
       state: transformedAddress.state,
       street: transformedAddress.street,
     },
+    type: 'HOUSE',
   });
-  setStep((prev) => prev + 1);
+  setStep(prev => prev + 1);
 }
