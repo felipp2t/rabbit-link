@@ -16,6 +16,6 @@ export interface ServiceRequest {
     maximum: string;
   };
   location: Location;
-  workType: "REMOTE" | "ONSITE" | "HYBRID";
+  workType: "REMOTE" | "ONSITE";
   deadline: string;
 }
